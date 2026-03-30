@@ -1,14 +1,16 @@
 # shape-text
 
-Browser-first TypeScript library for laying out text inside polygon shapes and rendering the result to SVG.
+Browser-first TypeScript library for laying out text inside shapes and rendering the result to SVG.
 
 ## V1 scope
 
 - SVG renderer
 - Polygon input
+- Text-mask input from glyph text
 - Latin/Vietnamese first
 - Single closed shape, no holes
 - Shape-first API, not a thin wrapper over `pretext`
+- Compile-shape boundary for cache-friendly repeated rendering
 
 ## Install
 
@@ -51,12 +53,35 @@ const svg = renderLayoutToSvg(layout, {
 })
 ```
 
+## Text-mask autofill
+
+```ts
+const layout = layoutTextInShape({
+  text: 'ONE',
+  font: '16px Arial',
+  lineHeight: 20,
+  autoFill: true,
+  shape: {
+    kind: 'text-mask',
+    text: '2',
+    font: '700 420px Arial',
+    width: 340,
+    height: 460,
+    padding: 10,
+  },
+  measurer,
+})
+```
+
 ## Public API
 
 - `createCanvasTextMeasurer()`
+- `compileShapeForLayout()`
 - `prepareTextForLayout()`
 - `layoutNextLineFromPreparedText()`
+- `layoutNextLineFromRepeatedText()`
 - `getBandIntervalsFromPolygon()`
+- `layoutTextInCompiledShape()`
 - `layoutTextInShape()`
 - `renderLayoutToSvg()`
 
@@ -64,6 +89,9 @@ const svg = renderLayoutToSvg(layout, {
 
 - V1 keeps the text engine simple on purpose. It uses `Intl.Segmenter` for grapheme-safe word breaking, but it does not promise full browser-parity for every writing system.
 - The project takes inspiration from `pretext` for the `prepare -> layout` split and streaming line iteration, but owns its geometry, slot policy, and public API.
+- `text-mask` shapes are raster-compiled into reusable line bands. This is the default path for browser fonts such as `Arial`, and it is designed so callers can precompile `0-9` and `:` for clock-like UIs.
+- `autoFill: true` repeats the source text until the available shape bands are full.
+- For late-loading web fonts, compile after the font is ready if you want immediate cache reuse. The compiler skips cache writes until `document.fonts.check()` reports the font as ready.
 
 ## Local E2E
 
@@ -77,6 +105,12 @@ Run the local browser suite:
 
 ```bash
 npm run e2e
+```
+
+Run unit coverage for `src/`:
+
+```bash
+npm run test:coverage
 ```
 
 Useful dev modes:
