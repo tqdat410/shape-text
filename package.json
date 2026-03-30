@@ -20,7 +20,15 @@
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "check": "npm run typecheck && npm run test"
+    "check": "npm run typecheck && npm run test",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:headed": "playwright test --headed",
+    "e2e:debug": "playwright test --debug",
+    "e2e:serve": "npm run build && node ./scripts/serve-static-e2e.mjs",
+    "e2e:serve:dev": "node ./scripts/serve-static-e2e.mjs",
+    "demo": "npm run e2e:serve",
+    "demo:dev": "npm run e2e:serve:dev"
   },
   "keywords": [
     "svg",
@@ -32,8 +40,8 @@
   "author": "Admin",
   "license": "MIT",
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   }
 }
-

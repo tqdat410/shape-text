@@ -65,3 +65,47 @@ const svg = renderLayoutToSvg(layout, {
 - V1 keeps the text engine simple on purpose. It uses `Intl.Segmenter` for grapheme-safe word breaking, but it does not promise full browser-parity for every writing system.
 - The project takes inspiration from `pretext` for the `prepare -> layout` split and streaming line iteration, but owns its geometry, slot policy, and public API.
 
+## Local E2E
+
+Install the local browser once:
+
+```bash
+npx playwright install chromium
+```
+
+Run the local browser suite:
+
+```bash
+npm run e2e
+```
+
+Useful dev modes:
+
+```bash
+npm run e2e:ui
+npm run e2e:headed
+npm run e2e:debug
+```
+
+The E2E fixture is a static page served from `/e2e/fixtures/index.html`. It imports the built library from `/dist/index.js`, so the browser test path stays very close to real package usage.
+
+## Local Demo UI
+
+If you just want to open a real browser UI and click around:
+
+```bash
+npm run demo
+```
+
+Then open:
+
+```text
+http://127.0.0.1:4173/
+```
+
+For a fast local loop without rebuilding first:
+
+```bash
+npm run build
+npm run demo:dev
+```
