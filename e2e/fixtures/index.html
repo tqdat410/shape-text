@@ -146,7 +146,7 @@
       <section class="hero">
         <div class="card">
           <h1>shape-text demo</h1>
-          <p>Preview the current library in a real browser UI. Switch shapes, edit text, tweak line height, then render again.</p>
+          <p>Preview the current library in a real browser UI. Switch between polygon flow and glyph-mask flow, edit text, tweak line height, then render again.</p>
           <textarea id="text-input"></textarea>
           <div class="control-row">
             <label>
@@ -160,12 +160,13 @@
         <div class="card">
           <p>Scenarios</p>
           <div class="toolbar">
+            <button data-scenario="glyph-two-repeat">Glyph 2 Repeat</button>
             <button data-scenario="digit-two-wide">Digit 2 Wide</button>
             <button data-scenario="digit-two-narrow">Digit 2 Narrow</button>
             <button data-scenario="rectangle-wide">Rectangle Wide</button>
             <button data-scenario="rectangle-narrow">Rectangle Narrow</button>
           </div>
-          <p>Use the shape buttons to compare flow behavior. The JSON panel on the right is the current layout state returned by the library.</p>
+          <p>Use the shape buttons to compare flow behavior. The glyph scenario uses a real text mask and repeats ONE until the shape is full.</p>
         </div>
       </section>
       <div class="panel-grid">

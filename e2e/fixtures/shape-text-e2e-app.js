@@ -1,4 +1,5 @@
 import {
+  compileShapeForLayout,
   createCanvasTextMeasurer,
   layoutTextInShape,
   renderLayoutToSvg,
@@ -12,7 +13,7 @@ const lineHeightValue = document.querySelector('#line-height-value')
 const renderButton = document.querySelector('#render-button')
 const measurer = createCanvasTextMeasurer()
 
-const defaultText = [
+const defaultParagraph = [
   'Shape text lets a paragraph travel inside a silhouette thay vi chi wrap quanh float.',
   'Ban co the dung no de render layout hinh so 2, badge, logo block, hoac poster typography.',
   'E2E local o day uu tien deterministic browser path: build dist, import module, render SVG, assert lai state.',
@@ -44,11 +45,27 @@ function createDigitTwoPolygon(width, height) {
 }
 
 const scenarios = {
+  'glyph-two-repeat': {
+    shape: {
+      kind: 'text-mask',
+      text: '2',
+      font: '700 420px Arial',
+      width: 340,
+      height: 460,
+      padding: 10,
+      maskScale: 2,
+    },
+    autoFill: true,
+    text: 'ONE',
+    showShape: false,
+  },
   'digit-two-wide': {
     shape: { kind: 'polygon', points: createDigitTwoPolygon(340, 460) },
+    text: defaultParagraph,
   },
   'digit-two-narrow': {
     shape: { kind: 'polygon', points: createDigitTwoPolygon(240, 460) },
+    text: defaultParagraph,
   },
   'rectangle-wide': {
     shape: {
@@ -60,6 +77,7 @@ const scenarios = {
         { x: 0, y: 360 },
       ],
     },
+    text: defaultParagraph,
   },
   'rectangle-narrow': {
     shape: {
@@ -71,6 +89,7 @@ const scenarios = {
         { x: 0, y: 360 },
       ],
     },
+    text: defaultParagraph,
   },
 }
 
@@ -78,13 +97,15 @@ const state = {
   scenario: '',
   layout: null,
   svg: '',
-  text: defaultText,
+  text: 'ONE',
   lineHeight: 22,
 }
 
 function renderScenario(name) {
   const scenario = scenarios[name]
   if (!scenario) throw new Error(`Unknown scenario: ${name}`)
+
+  state.text = scenario.text ?? state.text
 
   const layout = layoutTextInShape({
     text: state.text,
@@ -93,6 +114,7 @@ function renderScenario(name) {
     shape: scenario.shape,
     measurer,
     minSlotWidth: 24,
+    autoFill: scenario.autoFill,
   })
 
   const svg = renderLayoutToSvg(layout, {
@@ -100,17 +122,20 @@ function renderScenario(name) {
     textFill: '#111827',
     shapeStroke: '#94a3b8',
     shapeFill: 'rgba(191, 219, 254, 0.18)',
-    showShape: true,
+    showShape: scenario.showShape ?? true,
     padding: 12,
   })
 
   state.scenario = name
   state.layout = layout
   state.svg = svg
+  textInput.value = state.text
   stage.innerHTML = svg
   summary.textContent = JSON.stringify(
     {
       scenario: name,
+      shapeKind: scenario.shape.kind,
+      autoFill: Boolean(scenario.autoFill),
       lineHeight: state.lineHeight,
       lineCount: layout.lines.length,
       exhausted: layout.exhausted,
@@ -124,6 +149,48 @@ function renderScenario(name) {
 
 window.shapeTextTestApi = {
   renderScenario,
+  compileScenarioTwice(name) {
+    const scenario = scenarios[name]
+    if (!scenario) throw new Error(`Unknown scenario: ${name}`)
+
+    const first = compileShapeForLayout({
+      shape: scenario.shape,
+      lineHeight: state.lineHeight,
+      minSlotWidth: 24,
+    })
+    const second = compileShapeForLayout({
+      shape: scenario.shape,
+      lineHeight: state.lineHeight,
+      minSlotWidth: 24,
+    })
+
+    return {
+      sameReference: first === second,
+      isFrozen: Object.isFrozen(first) && Object.isFrozen(first.bands),
+      bandCount: first.bands.length,
+      shapeKind: first.kind,
+    }
+  },
+  compileInvalidTextMaskShape() {
+    try {
+      compileShapeForLayout({
+        shape: {
+          kind: 'text-mask',
+          text: '2',
+          font: '700 420px Arial',
+          width: 340,
+          height: 460,
+          alphaThreshold: 999,
+        },
+        lineHeight: state.lineHeight,
+        minSlotWidth: 24,
+      })
+
+      return null
+    } catch (error) {
+      return error instanceof Error ? error.message : String(error)
+    }
+  },
   getState() {
     return state
   },
@@ -153,4 +220,4 @@ document.querySelectorAll('[data-scenario]').forEach(button => {
 })
 
 syncControls()
-renderScenario('digit-two-wide')
+renderScenario('glyph-two-repeat')

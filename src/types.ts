@@ -13,6 +13,19 @@ export type PolygonShape = {
   points: ShapeTextPoint[]
 }
 
+export type TextMaskShape = {
+  kind: 'text-mask'
+  text: string
+  font: string
+  width: number
+  height: number
+  padding?: number
+  maskScale?: number
+  alphaThreshold?: number
+}
+
+export type ShapeInput = PolygonShape | TextMaskShape
+
 export type TextMeasurer = {
   measureText(text: string, font: string): number
 }
@@ -57,24 +70,72 @@ export type ShapeBounds = {
   bottom: number
 }
 
+export type CompiledShapeBand = {
+  top: number
+  bottom: number
+  intervals: Interval[]
+}
+
+export type CompiledShapeDebugView =
+  | {
+      kind: 'polygon'
+      points: ShapeTextPoint[]
+    }
+  | {
+      kind: 'text'
+      text: string
+      font: string
+      x: number
+      baseline: number
+    }
+
+export type CompiledShapeBands = {
+  kind: ShapeInput['kind']
+  source: ShapeInput
+  bounds: ShapeBounds
+  bandHeight: number
+  minSlotWidth: number
+  bands: CompiledShapeBand[]
+  debugView: CompiledShapeDebugView
+}
+
 export type ShapeTextLayout = {
   font: string
   lineHeight: number
-  shape: PolygonShape
+  shape: ShapeInput
+  compiledShape: CompiledShapeBands
   bounds: ShapeBounds
   lines: ShapeTextLine[]
   exhausted: boolean
+  autoFill: boolean
+}
+
+export type CompileShapeForLayoutOptions = {
+  shape: ShapeInput
+  lineHeight: number
+  minSlotWidth?: number
+}
+
+export type LayoutTextInCompiledShapeOptions = {
+  text: string
+  font: string
+  compiledShape: CompiledShapeBands
+  measurer: TextMeasurer
+  align?: 'left' | 'center'
+  baselineRatio?: number
+  autoFill?: boolean
 }
 
 export type LayoutTextInShapeOptions = {
   text: string
   font: string
   lineHeight: number
-  shape: PolygonShape
+  shape: ShapeInput
   measurer: TextMeasurer
   align?: 'left' | 'center'
   minSlotWidth?: number
   baselineRatio?: number
+  autoFill?: boolean
 }
 
 export type RenderLayoutToSvgOptions = {
@@ -85,4 +146,3 @@ export type RenderLayoutToSvgOptions = {
   shapeFill?: string
   showShape?: boolean
 }
-

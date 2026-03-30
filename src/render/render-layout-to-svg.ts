@@ -1,8 +1,25 @@
-import type { RenderLayoutToSvgOptions, ShapeTextLayout, ShapeTextPoint } from '../types.js'
+import type {
+  CompiledShapeDebugView,
+  RenderLayoutToSvgOptions,
+  ShapeTextLayout,
+  ShapeTextPoint,
+} from '../types.js'
 import { escapeXmlText } from './escape-xml-text.js'
 
 function renderPoints(points: ShapeTextPoint[]): string {
   return points.map(point => `${point.x},${point.y}`).join(' ')
+}
+
+function renderDebugShape(
+  debugView: CompiledShapeDebugView,
+  shapeFill: string,
+  shapeStroke: string,
+): string {
+  if (debugView.kind === 'polygon') {
+    return `<polygon points="${renderPoints(debugView.points)}" fill="${shapeFill}" stroke="${shapeStroke}" stroke-width="1" />`
+  }
+
+  return `<text x="${debugView.x}" y="${debugView.baseline}" fill="${shapeFill}" stroke="${shapeStroke}" stroke-width="1" style="font:${escapeXmlText(debugView.font)};">${escapeXmlText(debugView.text)}</text>`
 }
 
 export function renderLayoutToSvg(
@@ -29,9 +46,7 @@ export function renderLayoutToSvg(
   }
 
   if (showShape) {
-    pieces.push(
-      `<polygon points="${renderPoints(layout.shape.points)}" fill="${shapeFill}" stroke="${shapeStroke}" stroke-width="1" />`,
-    )
+    pieces.push(renderDebugShape(layout.compiledShape.debugView, shapeFill, shapeStroke))
   }
 
   for (let index = 0; index < layout.lines.length; index++) {
@@ -44,4 +59,3 @@ export function renderLayoutToSvg(
   pieces.push('</svg>')
   return pieces.join('')
 }
-

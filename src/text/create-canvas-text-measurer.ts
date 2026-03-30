@@ -1,27 +1,8 @@
 import type { TextMeasurer } from '../types.js'
-
-type CanvasTextContext = {
-  font: string
-  measureText(text: string): TextMetrics
-}
-
-function createCanvasContext(): CanvasTextContext {
-  if (typeof OffscreenCanvas !== 'undefined') {
-    const context = new OffscreenCanvas(1, 1).getContext('2d')
-    if (context !== null) return context
-  }
-
-  if (typeof document !== 'undefined') {
-    const canvas = document.createElement('canvas')
-    const context = canvas.getContext('2d')
-    if (context !== null) return context
-  }
-
-  throw new Error('shape-text needs a browser canvas context or a custom TextMeasurer')
-}
+import { createBrowserCanvas2DContext } from './create-browser-canvas-2d-context.js'
 
 export function createCanvasTextMeasurer(): TextMeasurer {
-  const context = createCanvasContext()
+  const context = createBrowserCanvas2DContext()
 
   return {
     measureText(text, font) {
