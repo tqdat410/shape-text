@@ -10,7 +10,7 @@
 
 ## Data Flow
 
-1. Normalize and prepare text
+1. Normalize text formatting into a canonical font string
 2. Compile the input shape into reusable line bands
 3. Compute allowed intervals for each band
 4. Pick the widest interval
@@ -21,6 +21,8 @@
 ## Boundary Decisions
 
 - Text measurement stays replaceable through `TextMeasurer`
+- Layout-affecting text style stays in the layout API
 - Shape compilation stays separate from content flow so glyph shapes can be cached
 - Geometry stays shape-specific, not DOM-specific
+- Renderer-only decoration stays out of compile/layout caching
 - Renderer consumes compiled layout output only

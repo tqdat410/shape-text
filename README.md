@@ -31,7 +31,13 @@ const measurer = createCanvasTextMeasurer()
 
 const layout = layoutTextInShape({
   text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-  font: '16px "Helvetica Neue", Arial, sans-serif',
+  textStyle: {
+    family: '"Helvetica Neue", Arial, sans-serif',
+    size: 16,
+    weight: 700,
+    style: 'italic',
+    color: '#111827',
+  },
   lineHeight: 22,
   shape: {
     kind: 'polygon',
@@ -47,9 +53,15 @@ const layout = layoutTextInShape({
 
 const svg = renderLayoutToSvg(layout, {
   background: '#fffdf7',
-  textFill: '#111827',
-  shapeStroke: '#d1d5db',
-  showShape: true,
+  shapeStyle: {
+    backgroundColor: '#dbeafe',
+    borderColor: '#94a3b8',
+    borderWidth: 2,
+    shadow: {
+      blur: 6,
+      offsetY: 6,
+    },
+  },
 })
 ```
 
@@ -58,7 +70,12 @@ const svg = renderLayoutToSvg(layout, {
 ```ts
 const layout = layoutTextInShape({
   text: 'ONE',
-  font: '16px Arial',
+  textStyle: {
+    family: 'Arial, sans-serif',
+    size: 16,
+    weight: 700,
+    color: '#0f172a',
+  },
   lineHeight: 20,
   autoFill: true,
   shape: {
@@ -77,6 +94,7 @@ const layout = layoutTextInShape({
 
 - `createCanvasTextMeasurer()`
 - `compileShapeForLayout()`
+- `normalizeTextStyleToFont()`
 - `prepareTextForLayout()`
 - `layoutNextLineFromPreparedText()`
 - `layoutNextLineFromRepeatedText()`
@@ -91,6 +109,8 @@ const layout = layoutTextInShape({
 - The project takes inspiration from `pretext` for the `prepare -> layout` split and streaming line iteration, but owns its geometry, slot policy, and public API.
 - `text-mask` shapes are raster-compiled into reusable line bands. This is the default path for browser fonts such as `Arial`, and it is designed so callers can precompile `0-9` and `:` for clock-like UIs.
 - `autoFill: true` repeats the source text until the available shape bands are full.
+- `textStyle` is the new data-driven API for size, weight, italic/oblique, family, and default text color. Legacy `font` string input still works.
+- `shapeStyle` lives in `renderLayoutToSvg()` because fill, border, and shadow do not affect line breaking or shape compilation.
 - For late-loading web fonts, compile after the font is ready if you want immediate cache reuse. The compiler skips cache writes until `document.fonts.check()` reports the font as ready.
 
 ## Local E2E

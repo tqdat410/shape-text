@@ -14,6 +14,8 @@
 - V1 is browser-first
 - Advanced i18n fidelity can be added later without breaking the public shape-first API
 - Keep shape compilation separate from content flow so hot paths can reuse cached bands
+- Keep text formatting data-driven; do not pass framework components into the core API
+- Keep shape decoration renderer-only unless it changes geometry
 
 ## Testing Rules
 
