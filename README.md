@@ -78,6 +78,7 @@ const layout = layoutTextInShape({
   },
   lineHeight: 20,
   autoFill: true,
+  fillStrategy: 'max',
   shape: {
     kind: 'text-mask',
     text: '2',
@@ -109,6 +110,8 @@ const layout = layoutTextInShape({
 - The project takes inspiration from `pretext` for the `prepare -> layout` split and streaming line iteration, but owns its geometry, slot policy, and public API.
 - `text-mask` shapes are raster-compiled into reusable line bands. This is the default path for browser fonts such as `Arial`, and it is designed so callers can precompile `0-9` and `:` for clock-like UIs.
 - `autoFill: true` repeats the source text until the available shape bands are full.
+- `autoFillMode: 'words'` is the default readable repeat behavior. `autoFillMode: 'dense'` strips whitespace and breaks at grapheme boundaries to pack shapes harder for decorative fills.
+- `fillStrategy: 'max'` switches to an all-slots pass that fills every usable interval in reading order. It keeps spaces as normal graphemes instead of stripping them, and it does not fall back to smaller text for leftover pockets.
 - `textStyle` is the new data-driven API for size, weight, italic/oblique, family, and default text color. Legacy `font` string input still works.
 - `shapeStyle` lives in `renderLayoutToSvg()` because fill, border, and shadow do not affect line breaking or shape compilation.
 - For late-loading web fonts, compile after the font is ready if you want immediate cache reuse. The compiler skips cache writes until `document.fonts.check()` reports the font as ready.

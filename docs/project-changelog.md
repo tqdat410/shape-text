@@ -19,5 +19,7 @@
 
 - Added structured `textStyle` API for text size, family, weight, style, and default color
 - Added renderer-side `shapeStyle` API for shape fill, border, and shadow
+- Added `autoFillMode: 'dense'` for whitespace-stripped grapheme repeat fill inside compiled shape bands
+- Added `fillStrategy: 'max'` for all-slot glyph coverage without mini-font fallback, while preserving spaces in the repeat stream
 - Kept legacy `font`, `textFill`, `shapeFill`, and `shapeStroke` compatibility paths
 - Extended local demo and Playwright coverage for style and decoration controls
