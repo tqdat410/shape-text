@@ -128,6 +128,68 @@ test('applies text and shape style controls to the rendered SVG', async ({ page 
   expect(state.svg).toContain('shape-text-shape-shadow')
 })
 
+test('preserves edited glyph autofill text without forcing uppercase', async ({ page }) => {
+  await page.goto('/')
+
+  await page.locator('#text-input').fill('one')
+  await page.locator('#render-button').click()
+
+  const state = await getState(page)
+
+  await expect(page.locator('#text-input')).toHaveValue('one')
+  expect(state.text).toBe('one')
+  expect(state.layout.lines[0]?.text).toContain('one')
+  expect(state.layout.lines[0]?.text).not.toContain('ONE')
+  expect(state.svg).toContain('>one<')
+})
+
+test('keeps edited text when switching away from and back to the glyph scenario', async ({
+  page,
+}) => {
+  await page.goto('/')
+
+  await page.locator('#text-input').fill('one')
+  await page.locator('#render-button').click()
+  await page.evaluate(() => window.shapeTextTestApi.renderScenario('rectangle-wide'))
+  await page.evaluate(() => window.shapeTextTestApi.renderScenario('glyph-two-repeat'))
+
+  const state = await getState(page)
+
+  await expect(page.locator('#text-input')).toHaveValue('one')
+  expect(state.scenario).toBe('glyph-two-repeat')
+  expect(state.text).toBe('one')
+  expect(state.layout.lines[0]?.text).toContain('one')
+  expect(state.layout.lines[0]?.text).not.toContain('ONE')
+})
+
+test('keeps unsaved textarea edits when switching scenarios', async ({ page }) => {
+  await page.goto('/')
+
+  await page.locator('#text-input').fill('draft')
+  await page.evaluate(() => window.shapeTextTestApi.renderScenario('rectangle-wide'))
+
+  const state = await getState(page)
+
+  await expect(page.locator('#text-input')).toHaveValue('draft')
+  expect(state.scenario).toBe('rectangle-wide')
+  expect(state.text).toBe('draft')
+  expect(state.layout.lines[0]?.text).toContain('draft')
+})
+
+test('keeps scenario defaults when rerender changes only style controls', async ({ page }) => {
+  await page.goto('/')
+
+  await setRangeValue(page, '#text-size-input', '24')
+  await page.locator('#render-button').click()
+  await page.evaluate(() => window.shapeTextTestApi.renderScenario('rectangle-wide'))
+
+  const state = await getState(page)
+
+  expect(state.scenario).toBe('rectangle-wide')
+  expect(state.text).toContain('Shape text lets a paragraph travel inside a silhouette')
+  expect(state.layout.lines[0]?.text).toContain('Shape text')
+})
+
 test('reflows into more lines in the narrow rectangle scenario', async ({ page }) => {
   await page.goto('/')
 

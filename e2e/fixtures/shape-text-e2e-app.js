@@ -119,6 +119,7 @@ const state = {
   shapeBorderColor: '#94a3b8',
   shapeShadow: true,
 }
+let hasUserEditedText = false
 
 function getTextStyle() {
   return {
@@ -146,11 +147,19 @@ function getShapeStyle() {
   }
 }
 
-function renderScenario(name) {
+function resolveScenarioText(name) {
   const scenario = scenarios[name]
   if (!scenario) throw new Error(`Unknown scenario: ${name}`)
 
-  state.text = scenario.text ?? state.text
+  if (!hasUserEditedText && scenario.text !== undefined) {
+    state.text = scenario.text
+  }
+
+  return scenario
+}
+
+function renderScenario(name) {
+  const scenario = resolveScenarioText(name)
 
   const layout = layoutTextInShape({
     text: state.text,
@@ -274,6 +283,11 @@ renderButton.addEventListener('click', () => {
   textSizeValue.textContent = String(state.textSize)
   shapeBorderWidthValue.textContent = String(state.shapeBorderWidth)
   renderScenario(state.scenario || 'digit-two-wide')
+})
+
+textInput.addEventListener('input', () => {
+  state.text = textInput.value
+  hasUserEditedText = true
 })
 
 lineHeightInput.addEventListener('input', () => {
