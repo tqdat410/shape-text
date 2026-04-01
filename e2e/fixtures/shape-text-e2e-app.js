@@ -10,6 +10,17 @@ const summary = document.querySelector('#summary')
 const textInput = document.querySelector('#text-input')
 const lineHeightInput = document.querySelector('#line-height-input')
 const lineHeightValue = document.querySelector('#line-height-value')
+const textSizeInput = document.querySelector('#text-size-input')
+const textSizeValue = document.querySelector('#text-size-value')
+const textWeightSelect = document.querySelector('#text-weight-select')
+const textItalicInput = document.querySelector('#text-italic-input')
+const textColorInput = document.querySelector('#text-color-input')
+const shapeFillInput = document.querySelector('#shape-fill-input')
+const shapeBorderWidthInput = document.querySelector('#shape-border-width-input')
+const shapeBorderWidthValue = document.querySelector('#shape-border-width-value')
+const shapeBorderColorInput = document.querySelector('#shape-border-color-input')
+const shapeShadowInput = document.querySelector('#shape-shadow-input')
+const showShapeInput = document.querySelector('#show-shape-input')
 const renderButton = document.querySelector('#render-button')
 const measurer = createCanvasTextMeasurer()
 
@@ -57,7 +68,6 @@ const scenarios = {
     },
     autoFill: true,
     text: 'ONE',
-    showShape: false,
   },
   'digit-two-wide': {
     shape: { kind: 'polygon', points: createDigitTwoPolygon(340, 460) },
@@ -99,6 +109,41 @@ const state = {
   svg: '',
   text: 'ONE',
   lineHeight: 22,
+  textSize: 18,
+  textWeight: 700,
+  textItalic: false,
+  textColor: '#111827',
+  showShape: true,
+  shapeFill: '#dbeafe',
+  shapeBorderWidth: 2,
+  shapeBorderColor: '#94a3b8',
+  shapeShadow: true,
+}
+
+function getTextStyle() {
+  return {
+    family: '"Helvetica Neue", Arial, sans-serif',
+    size: state.textSize,
+    weight: state.textWeight,
+    style: state.textItalic ? 'italic' : 'normal',
+    color: state.textColor,
+  }
+}
+
+function getShapeStyle() {
+  return {
+    backgroundColor: state.shapeFill,
+    borderColor: state.shapeBorderColor,
+    borderWidth: state.shapeBorderWidth,
+    shadow: state.shapeShadow
+      ? {
+          color: 'rgba(15, 23, 42, 0.22)',
+          blur: 6,
+          offsetX: 0,
+          offsetY: 6,
+        }
+      : undefined,
+  }
 }
 
 function renderScenario(name) {
@@ -109,7 +154,7 @@ function renderScenario(name) {
 
   const layout = layoutTextInShape({
     text: state.text,
-    font: '16px "Helvetica Neue", Arial, sans-serif',
+    textStyle: getTextStyle(),
     lineHeight: state.lineHeight,
     shape: scenario.shape,
     measurer,
@@ -119,10 +164,8 @@ function renderScenario(name) {
 
   const svg = renderLayoutToSvg(layout, {
     background: '#fffdf7',
-    textFill: '#111827',
-    shapeStroke: '#94a3b8',
-    shapeFill: 'rgba(191, 219, 254, 0.18)',
-    showShape: scenario.showShape ?? true,
+    shapeStyle: getShapeStyle(),
+    showShape: state.showShape,
     padding: 12,
   })
 
@@ -137,6 +180,8 @@ function renderScenario(name) {
       shapeKind: scenario.shape.kind,
       autoFill: Boolean(scenario.autoFill),
       lineHeight: state.lineHeight,
+      textStyle: getTextStyle(),
+      shapeStyle: getShapeStyle(),
       lineCount: layout.lines.length,
       exhausted: layout.exhausted,
       firstLine: layout.lines[0]?.text ?? null,
@@ -200,17 +245,47 @@ function syncControls() {
   textInput.value = state.text
   lineHeightInput.value = String(state.lineHeight)
   lineHeightValue.textContent = String(state.lineHeight)
+  textSizeInput.value = String(state.textSize)
+  textSizeValue.textContent = String(state.textSize)
+  textWeightSelect.value = String(state.textWeight)
+  textItalicInput.checked = state.textItalic
+  textColorInput.value = state.textColor
+  showShapeInput.checked = state.showShape
+  shapeFillInput.value = state.shapeFill
+  shapeBorderWidthInput.value = String(state.shapeBorderWidth)
+  shapeBorderWidthValue.textContent = String(state.shapeBorderWidth)
+  shapeBorderColorInput.value = state.shapeBorderColor
+  shapeShadowInput.checked = state.shapeShadow
 }
 
 renderButton.addEventListener('click', () => {
   state.text = textInput.value
   state.lineHeight = Number(lineHeightInput.value)
+  state.textSize = Number(textSizeInput.value)
+  state.textWeight = Number(textWeightSelect.value)
+  state.textItalic = textItalicInput.checked
+  state.textColor = textColorInput.value
+  state.showShape = showShapeInput.checked
+  state.shapeFill = shapeFillInput.value
+  state.shapeBorderWidth = Number(shapeBorderWidthInput.value)
+  state.shapeBorderColor = shapeBorderColorInput.value
+  state.shapeShadow = shapeShadowInput.checked
   lineHeightValue.textContent = String(state.lineHeight)
+  textSizeValue.textContent = String(state.textSize)
+  shapeBorderWidthValue.textContent = String(state.shapeBorderWidth)
   renderScenario(state.scenario || 'digit-two-wide')
 })
 
 lineHeightInput.addEventListener('input', () => {
   lineHeightValue.textContent = lineHeightInput.value
+})
+
+textSizeInput.addEventListener('input', () => {
+  textSizeValue.textContent = textSizeInput.value
+})
+
+shapeBorderWidthInput.addEventListener('input', () => {
+  shapeBorderWidthValue.textContent = shapeBorderWidthInput.value
 })
 
 document.querySelectorAll('[data-scenario]').forEach(button => {

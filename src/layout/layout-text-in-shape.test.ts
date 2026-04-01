@@ -103,4 +103,31 @@ describe('layoutTextInShape', () => {
     expect(layout.autoFill).toBe(true)
     expect(layout.exhausted).toBe(false)
   })
+
+  it('normalizes textStyle into the resolved layout font and color', () => {
+    const layout = layoutTextInShape({
+      text: 'xin chao',
+      textStyle: {
+        family: 'Test Sans',
+        size: 18,
+        weight: 700,
+        style: 'italic',
+        color: '#2563eb',
+      },
+      lineHeight: 20,
+      shape: {
+        kind: 'polygon',
+        points: [
+          { x: 0, y: 0 },
+          { x: 120, y: 0 },
+          { x: 120, y: 40 },
+          { x: 0, y: 40 },
+        ],
+      },
+      measurer: createFixedWidthTextMeasurer(),
+    })
+
+    expect(layout.font).toBe('italic 700 18px Test Sans')
+    expect(layout.textStyle?.color).toBe('#2563eb')
+  })
 })

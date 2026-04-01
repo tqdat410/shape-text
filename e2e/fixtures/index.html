@@ -117,6 +117,13 @@
         margin-top: 14px;
       }
 
+      .controls-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 14px;
+      }
+
       label {
         display: grid;
         gap: 6px;
@@ -138,6 +145,10 @@
         .panel-grid {
           grid-template-columns: 1fr;
         }
+
+        .controls-grid {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
   </head>
@@ -146,14 +157,57 @@
       <section class="hero">
         <div class="card">
           <h1>shape-text demo</h1>
-          <p>Preview the current library in a real browser UI. Switch between polygon flow and glyph-mask flow, edit text, tweak line height, then render again.</p>
+          <p>Preview the current library in a real browser UI. Switch between polygon flow and glyph-mask flow, edit text, tweak text style and shape decoration, then render again.</p>
           <textarea id="text-input"></textarea>
-          <div class="control-row">
+          <div class="controls-grid">
             <label>
               Line height
               <input id="line-height-input" type="range" min="18" max="34" step="1" value="22" />
             </label>
-            <span>Current: <span id="line-height-value" class="metric">22</span>px</span>
+            <label>
+              Text size
+              <input id="text-size-input" type="range" min="14" max="34" step="1" value="18" />
+            </label>
+            <label>
+              Weight
+              <select id="text-weight-select">
+                <option value="400">Regular</option>
+                <option value="700" selected>Bold</option>
+              </select>
+            </label>
+            <label>
+              Text color
+              <input id="text-color-input" type="color" value="#111827" />
+            </label>
+            <label>
+              Shape fill
+              <input id="shape-fill-input" type="color" value="#dbeafe" />
+            </label>
+            <label>
+              Border color
+              <input id="shape-border-color-input" type="color" value="#94a3b8" />
+            </label>
+            <label>
+              Border width
+              <input id="shape-border-width-input" type="range" min="0" max="12" step="1" value="2" />
+            </label>
+          </div>
+          <div class="control-row">
+            <span>Line: <span id="line-height-value" class="metric">22</span>px</span>
+            <span>Text: <span id="text-size-value" class="metric">18</span>px</span>
+            <span>Border: <span id="shape-border-width-value" class="metric">2</span>px</span>
+            <label>
+              <input id="text-italic-input" type="checkbox" />
+              Italic
+            </label>
+            <label>
+              <input id="show-shape-input" type="checkbox" checked />
+              Show shape
+            </label>
+            <label>
+              <input id="shape-shadow-input" type="checkbox" checked />
+              Shadow
+            </label>
             <button id="render-button" class="primary-button" type="button">Render</button>
           </div>
         </div>

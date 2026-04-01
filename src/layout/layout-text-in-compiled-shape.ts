@@ -7,6 +7,7 @@ import type {
 } from '../types.js'
 import { layoutNextLineFromPreparedText } from '../text/layout-next-line-from-prepared-text.js'
 import { layoutNextLineFromRepeatedText } from '../text/layout-next-line-from-repeated-text.js'
+import { resolveLayoutTextStyle } from '../text/normalize-text-style-to-font.js'
 import { prepareTextForLayout } from '../text/prepare-text-for-layout.js'
 
 function pickWidestInterval(intervals: Interval[]): Interval {
@@ -25,7 +26,11 @@ function pickWidestInterval(intervals: Interval[]): Interval {
 export function layoutTextInCompiledShape(
   options: LayoutTextInCompiledShapeOptions,
 ): ShapeTextLayout {
-  const prepared = prepareTextForLayout(options.text, options.font, options.measurer)
+  const resolvedTextStyle = resolveLayoutTextStyle({
+    font: options.font,
+    textStyle: options.textStyle,
+  })
+  const prepared = prepareTextForLayout(options.text, resolvedTextStyle.font, options.measurer)
   const autoFill = options.autoFill ?? false
   const align = options.align ?? 'left'
   const baselineRatio = options.baselineRatio ?? 0.8
@@ -64,7 +69,8 @@ export function layoutTextInCompiledShape(
   }
 
   return {
-    font: options.font,
+    font: resolvedTextStyle.font,
+    textStyle: resolvedTextStyle,
     lineHeight: options.compiledShape.bandHeight,
     shape: options.compiledShape.source,
     compiledShape: options.compiledShape,

@@ -30,6 +30,51 @@ export type TextMeasurer = {
   measureText(text: string, font: string): number
 }
 
+export type TextStyleInput = {
+  family: string
+  size: number
+  weight?: number | string
+  style?: 'normal' | 'italic' | 'oblique'
+  color?: string
+}
+
+export type ResolvedTextStyle = {
+  font: string
+  family?: string
+  size?: number
+  weight?: number | string
+  style?: 'normal' | 'italic' | 'oblique'
+  color?: string
+}
+
+export type ShapeShadowInput = {
+  color?: string
+  blur: number
+  offsetX?: number
+  offsetY?: number
+}
+
+export type ResolvedShapeShadow = {
+  color: string
+  blur: number
+  offsetX: number
+  offsetY: number
+}
+
+export type ShapeStyleInput = {
+  backgroundColor?: string
+  borderColor?: string
+  borderWidth?: number
+  shadow?: ShapeShadowInput
+}
+
+export type ResolvedShapeStyle = {
+  backgroundColor?: string
+  borderColor: string
+  borderWidth: number
+  shadow?: ResolvedShapeShadow
+}
+
 export type PreparedLayoutToken = {
   kind: 'word' | 'newline'
   text: string
@@ -101,6 +146,7 @@ export type CompiledShapeBands = {
 
 export type ShapeTextLayout = {
   font: string
+  textStyle?: ResolvedTextStyle
   lineHeight: number
   shape: ShapeInput
   compiledShape: CompiledShapeBands
@@ -118,17 +164,24 @@ export type CompileShapeForLayoutOptions = {
 
 export type LayoutTextInCompiledShapeOptions = {
   text: string
-  font: string
   compiledShape: CompiledShapeBands
   measurer: TextMeasurer
   align?: 'left' | 'center'
   baselineRatio?: number
   autoFill?: boolean
-}
+} & (
+  | {
+      font: string
+      textStyle?: TextStyleInput
+    }
+  | {
+      font?: string
+      textStyle: TextStyleInput
+    }
+)
 
 export type LayoutTextInShapeOptions = {
   text: string
-  font: string
   lineHeight: number
   shape: ShapeInput
   measurer: TextMeasurer
@@ -136,7 +189,16 @@ export type LayoutTextInShapeOptions = {
   minSlotWidth?: number
   baselineRatio?: number
   autoFill?: boolean
-}
+} & (
+  | {
+      font: string
+      textStyle?: TextStyleInput
+    }
+  | {
+      font?: string
+      textStyle: TextStyleInput
+    }
+)
 
 export type RenderLayoutToSvgOptions = {
   padding?: number
@@ -144,5 +206,6 @@ export type RenderLayoutToSvgOptions = {
   textFill?: string
   shapeStroke?: string
   shapeFill?: string
+  shapeStyle?: ShapeStyleInput
   showShape?: boolean
 }

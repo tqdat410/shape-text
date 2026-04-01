@@ -9,9 +9,22 @@ export function layoutTextInShape(options: LayoutTextInShapeOptions): ShapeTextL
     minSlotWidth: options.minSlotWidth,
   })
 
+  if (options.textStyle !== undefined) {
+    return layoutTextInCompiledShape({
+      text: options.text,
+      font: options.font,
+      textStyle: options.textStyle,
+      compiledShape,
+      measurer: options.measurer,
+      align: options.align,
+      baselineRatio: options.baselineRatio,
+      autoFill: options.autoFill,
+    })
+  }
+
   return layoutTextInCompiledShape({
     text: options.text,
-    font: options.font,
+    font: options.font!,
     compiledShape,
     measurer: options.measurer,
     align: options.align,
