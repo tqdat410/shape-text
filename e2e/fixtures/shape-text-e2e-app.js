@@ -15,6 +15,7 @@ const textSizeValue = document.querySelector('#text-size-value')
 const textWeightSelect = document.querySelector('#text-weight-select')
 const textItalicInput = document.querySelector('#text-italic-input')
 const textColorInput = document.querySelector('#text-color-input')
+const autoFillModeSelect = document.querySelector('#auto-fill-mode-select')
 const shapeFillInput = document.querySelector('#shape-fill-input')
 const shapeBorderWidthInput = document.querySelector('#shape-border-width-input')
 const shapeBorderWidthValue = document.querySelector('#shape-border-width-value')
@@ -113,6 +114,8 @@ const state = {
   textWeight: 700,
   textItalic: false,
   textColor: '#111827',
+  autoFillMode: 'words',
+  fillStrategy: 'flow',
   showShape: true,
   shapeFill: '#dbeafe',
   shapeBorderWidth: 2,
@@ -120,6 +123,21 @@ const state = {
   shapeShadow: true,
 }
 let hasUserEditedText = false
+
+function getFillSelectValue() {
+  return state.fillStrategy === 'max' ? 'max' : state.autoFillMode
+}
+
+function applyFillSelection(value) {
+  if (value === 'max') {
+    state.autoFillMode = 'stream'
+    state.fillStrategy = 'max'
+    return
+  }
+
+  state.autoFillMode = value
+  state.fillStrategy = 'flow'
+}
 
 function getTextStyle() {
   return {
@@ -167,8 +185,10 @@ function renderScenario(name) {
     lineHeight: state.lineHeight,
     shape: scenario.shape,
     measurer,
-    minSlotWidth: 24,
+    minSlotWidth: state.fillStrategy === 'max' ? 8 : 24,
     autoFill: scenario.autoFill,
+    autoFillMode: state.autoFillMode,
+    fillStrategy: state.fillStrategy,
   })
 
   const svg = renderLayoutToSvg(layout, {
@@ -188,6 +208,8 @@ function renderScenario(name) {
       scenario: name,
       shapeKind: scenario.shape.kind,
       autoFill: Boolean(scenario.autoFill),
+      autoFillMode: layout.autoFillMode,
+      fillStrategy: layout.fillStrategy,
       lineHeight: state.lineHeight,
       textStyle: getTextStyle(),
       shapeStyle: getShapeStyle(),
@@ -259,6 +281,7 @@ function syncControls() {
   textWeightSelect.value = String(state.textWeight)
   textItalicInput.checked = state.textItalic
   textColorInput.value = state.textColor
+  autoFillModeSelect.value = getFillSelectValue()
   showShapeInput.checked = state.showShape
   shapeFillInput.value = state.shapeFill
   shapeBorderWidthInput.value = String(state.shapeBorderWidth)
@@ -274,6 +297,7 @@ renderButton.addEventListener('click', () => {
   state.textWeight = Number(textWeightSelect.value)
   state.textItalic = textItalicInput.checked
   state.textColor = textColorInput.value
+  applyFillSelection(autoFillModeSelect.value)
   state.showShape = showShapeInput.checked
   state.shapeFill = shapeFillInput.value
   state.shapeBorderWidth = Number(shapeBorderWidthInput.value)

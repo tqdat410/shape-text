@@ -15,12 +15,16 @@ declare global {
         scenario: string
         layout: {
           autoFill: boolean
+          autoFillMode: 'words' | 'dense' | 'stream'
+          fillStrategy: 'flow' | 'max'
           exhausted: boolean
           lines: Array<{
             text: string
             x: number
+            top: number
             width: number
             slot: { left: number; right: number }
+            fillPass?: 1 | 2
           }>
         }
         text: string
@@ -28,6 +32,8 @@ declare global {
         textWeight: number
         textItalic: boolean
         textColor: string
+        autoFillMode: 'words' | 'dense' | 'stream'
+        fillStrategy: 'flow' | 'max'
         showShape: boolean
         shapeFill: string
         shapeBorderWidth: number
@@ -69,6 +75,8 @@ test('renders the glyph text-mask fixture into SVG', async ({ page }) => {
   expect(state.text).toBe('ONE')
   expect(state.layout.lines.length).toBeGreaterThan(4)
   expect(state.layout.autoFill).toBe(true)
+  expect(state.layout.autoFillMode).toBe('words')
+  expect(state.layout.fillStrategy).toBe('flow')
   expect(state.layout.exhausted).toBe(false)
   expect(state.layout.lines[0]?.text).toContain('ONE')
   expect(state.textSize).toBe(18)
@@ -126,6 +134,44 @@ test('applies text and shape style controls to the rendered SVG', async ({ page 
   expect(state.svg).toContain('stroke-width="6"')
   expect(state.svg).toContain('fill="#fde68a"')
   expect(state.svg).toContain('shape-text-shape-shadow')
+})
+
+test('packs glyph autofill more tightly in dense mode', async ({ page }) => {
+  await page.goto('/')
+
+  const wordsState = await getState(page)
+
+  await page.locator('#auto-fill-mode-select').selectOption('dense')
+  await page.locator('#render-button').click()
+
+  const denseState = await getState(page)
+
+  expect(wordsState.layout.autoFillMode).toBe('words')
+  expect(denseState.layout.autoFillMode).toBe('dense')
+  expect(denseState.autoFillMode).toBe('dense')
+  expect(denseState.layout.lines[0]?.text).not.toContain(' ')
+  expect(denseState.layout.lines[0]?.width).toBeGreaterThan(wordsState.layout.lines[0]?.width ?? 0)
+})
+
+test('keeps spaces and fills multiple slots in max mode without mini-font fallback', async ({ page }) => {
+  await page.goto('/')
+
+  await page.locator('#text-input').fill('ONE ONE')
+  await page.locator('#auto-fill-mode-select').selectOption('dense')
+  await page.locator('#render-button').click()
+  const denseState = await getState(page)
+
+  await page.locator('#auto-fill-mode-select').selectOption('max')
+  await page.locator('#render-button').click()
+  const maxState = await getState(page)
+
+  expect(maxState.fillStrategy).toBe('max')
+  expect(maxState.layout.fillStrategy).toBe('max')
+  expect(maxState.layout.autoFillMode).toBe('stream')
+  expect(maxState.layout.lines.some(line => line.text.includes(' '))).toBe(true)
+  expect(maxState.layout.lines.some((line, index, lines) => lines.some(other => other !== line && other.top === line.top))).toBe(true)
+  expect(maxState.layout.lines.length).toBeGreaterThanOrEqual(denseState.layout.lines.length)
+  expect(maxState.svg).not.toMatch(/font:[^"]*12\./)
 })
 
 test('preserves edited glyph autofill text without forcing uppercase', async ({ page }) => {

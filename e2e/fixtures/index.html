@@ -180,6 +180,14 @@
               <input id="text-color-input" type="color" value="#111827" />
             </label>
             <label>
+              Fill mode
+              <select id="auto-fill-mode-select">
+                <option value="words" selected>Word repeat</option>
+                <option value="dense">Dense repeat</option>
+                <option value="max">Max fill</option>
+              </select>
+            </label>
+            <label>
               Shape fill
               <input id="shape-fill-input" type="color" value="#dbeafe" />
             </label>
@@ -220,7 +228,7 @@
             <button data-scenario="rectangle-wide">Rectangle Wide</button>
             <button data-scenario="rectangle-narrow">Rectangle Narrow</button>
           </div>
-          <p>Use the shape buttons to compare flow behavior. The glyph scenario uses a real text mask and repeats whatever text is currently in the editor until the shape is full.</p>
+          <p>Use the shape buttons to compare flow behavior. The glyph scenario uses a real text mask and can repeat by words, dense grapheme flow, or max fill with extra slot coverage while still keeping spaces in the text stream.</p>
         </div>
       </section>
       <div class="panel-grid">

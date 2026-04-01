@@ -127,7 +127,7 @@ export function renderLayoutToSvg(
   for (let index = 0; index < layout.lines.length; index++) {
     const line = layout.lines[index]!
     pieces.push(
-      `<text x="${line.x}" y="${line.baseline}" fill="${escapeXmlText(textFill)}" style="font:${escapeXmlText(layout.font)};">${escapeXmlText(line.text)}</text>`,
+      `<text x="${line.x}" y="${line.baseline}" fill="${escapeXmlText(textFill)}" style="font:${escapeXmlText(line.font ?? layout.font)};">${escapeXmlText(line.text)}</text>`,
     )
   }
 

@@ -111,6 +111,80 @@ describe('renderLayoutToSvg', () => {
     expect(svg).not.toContain('fill="#2563eb"')
   })
 
+  it('renders line-level font overrides for residual max-fill passes', () => {
+    const svg = renderLayoutToSvg({
+      font: '16px Test Sans',
+      lineHeight: 20,
+      shape: {
+        kind: 'polygon',
+        points: [
+          { x: 0, y: 0 },
+          { x: 120, y: 0 },
+          { x: 120, y: 40 },
+          { x: 0, y: 40 },
+        ],
+      },
+      compiledShape: {
+        kind: 'polygon',
+        source: {
+          kind: 'polygon',
+          points: [
+            { x: 0, y: 0 },
+            { x: 120, y: 0 },
+            { x: 120, y: 40 },
+            { x: 0, y: 40 },
+          ],
+        },
+        bounds: { left: 0, top: 0, right: 120, bottom: 40 },
+        bandHeight: 20,
+        minSlotWidth: 16,
+        bands: [],
+        debugView: {
+          kind: 'polygon',
+          points: [
+            { x: 0, y: 0 },
+            { x: 120, y: 0 },
+            { x: 120, y: 40 },
+            { x: 0, y: 40 },
+          ],
+        },
+      },
+      bounds: { left: 0, top: 0, right: 120, bottom: 40 },
+      lines: [
+        {
+          text: 'BASE',
+          width: 40,
+          start: { tokenIndex: 0, graphemeIndex: 0 },
+          end: { tokenIndex: 4, graphemeIndex: 0 },
+          x: 0,
+          top: 0,
+          baseline: 16,
+          slot: { left: 0, right: 60 },
+          fillPass: 1,
+        },
+        {
+          text: 'mini',
+          width: 24,
+          start: { tokenIndex: 4, graphemeIndex: 0 },
+          end: { tokenIndex: 8, graphemeIndex: 0 },
+          x: 60,
+          top: 12,
+          baseline: 24,
+          slot: { left: 60, right: 96 },
+          font: '11.52px Test Sans',
+          fillPass: 2,
+        },
+      ],
+      exhausted: false,
+      autoFill: true,
+      autoFillMode: 'dense',
+      fillStrategy: 'max',
+    } satisfies ShapeTextLayout)
+
+    expect(svg).toContain('style="font:16px Test Sans;"')
+    expect(svg).toContain('style="font:11.52px Test Sans;"')
+  })
+
   it('does not inject a border when shapeStyle only sets background color', () => {
     const layout = layoutTextInShape({
       text: 'fill only',
@@ -213,6 +287,8 @@ describe('renderLayoutToSvg', () => {
       lines: [],
       exhausted: true,
       autoFill: false,
+      autoFillMode: 'words',
+      fillStrategy: 'flow',
     } satisfies ShapeTextLayout)
 
     expect(svg).toContain('<svg')
