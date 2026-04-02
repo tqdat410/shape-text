@@ -19,19 +19,6 @@ npm install shape-text
 bun add shape-text
 ```
 
-## Local demo and browser E2E
-
-```bash
-npx playwright install chromium
-npm run demo
-npm run e2e:ui
-```
-
-- `npm run demo` starts the React workbench on `http://127.0.0.1:4173/`
-- `npm run demo:preview` serves the built demo
-- `npm run e2e` and `npm run e2e:ui` run Playwright against the built preview app on port `4174`, which is closer to production than hitting the dev server
-- The npm scripts resolve their own package root so they still work even if Windows launches `cmd.exe` with a broken fallback cwd
-
 ## Ship readiness
 
 Library packaging is validated for both `npm` and `bun`.
@@ -186,77 +173,35 @@ const layout = layoutTextInShape({
 - `shapeStyle` lives in `renderLayoutToSvg()` because fill, border, and shadow do not affect line breaking or shape compilation.
 - For late-loading web fonts, compile after the font is ready if you want immediate cache reuse. The compiler skips cache writes until `document.fonts.check()` reports the font as ready.
 
-## Local E2E
+## Maintainer checks
 
-Install the local browser once:
-
-```bash
-npx playwright install chromium
-```
-
-Run the local browser suite:
+Run the local validation stack:
 
 ```bash
+npm run check
+npm run ship:check
 npm run e2e
 ```
 
-Run unit coverage for `src/`:
+Useful extras:
 
 ```bash
 npm run test:coverage
-```
-
-Useful dev modes:
-
-```bash
 npm run e2e:ui
 npm run e2e:headed
-npm run e2e:debug
 ```
-
-Playwright now targets the React workbench in `demo/`, so browser coverage runs against the same app used for manual exploration.
 
 ## Publish notes
 
 - Published package surface is limited to `dist/`, `README.md`, and `LICENSE`
 - `npm pack` / `npm publish` trigger a clean library rebuild through `prepack`
 - Build output excludes test files so the tarball stays library-only
+- On Windows terminals that start inside a `\\?\C:\...` cwd, prefer `npm run publish:npm` instead of raw `npm publish`
 - PR validation now runs through `.github/workflows/ci.yml`
 - Tag releases now run through `.github/workflows/release.yml`
-- Preferred publish path is npm Trusted Publisher via GitHub Actions OIDC, with `NPM_TOKEN` as fallback only
+- Release tags now skip npm publish automatically if that exact version already exists on npm
+- Preferred publish path after the first release is npm Trusted Publisher via GitHub Actions OIDC, with `NPM_TOKEN` as fallback only
 - Maintainer release steps and repository settings live in [docs/deployment-guide.md](./docs/deployment-guide.md)
-
-## Local Demo UI
-
-Open the React workbench:
-
-```bash
-npm run demo
-```
-
-Then open:
-
-```text
-http://127.0.0.1:4173/
-```
-
-Build the workbench explicitly:
-
-```bash
-npm run demo:build
-```
-
-Preview the built app:
-
-```bash
-npm run demo:preview
-```
-
-The workbench includes:
-
-- geometry vs value-derived shape source switching
-- direct `shape.text` editing for value-derived shapes
-- `shape.size.mode` switching between `fit-content` and `fixed`
 - `shapeTextMode` switching between `whole-text` and sequential `per-character` value-derived regions
 - random character-pattern fill presets
 - a payload JSON editor for the live `layout` + `render` request

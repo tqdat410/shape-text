@@ -30,7 +30,7 @@ Recommended:
 
 ## npm Trusted Publishing
 
-Trusted publishing is the preferred setup.
+Trusted publishing is the preferred setup after the first successful npm release.
 
 1. In npm package settings, add this GitHub repository and the `release.yml` workflow as a trusted publisher.
 2. Keep `id-token: write` permission enabled in the release workflow.
@@ -42,6 +42,8 @@ git push origin v0.1.0
 ```
 
 With trusted publishing enabled, `npm publish --provenance --access public` can authenticate through GitHub OIDC without a long-lived npm token.
+
+For a brand-new package name, publish the first version manually first, then switch later releases to trusted publishing.
 
 References:
 
@@ -86,6 +88,34 @@ git push origin v0.1.0
   - npm package published
   - GitHub release created
   - `bun add shape-text` still works through the smoke path
+
+## Manual First Publish From Windows
+
+If your Windows terminal starts the repo inside an extended path like `\\?\C:\...`, raw `npm publish` can fail before packaging with `Invalid file: URL, must comply with RFC 8089`.
+
+Use the repo script instead:
+
+```powershell
+npm run publish:npm
+```
+
+Useful variants:
+
+```powershell
+npm run publish:npm -- --dry-run
+npm run publish:npm -- --otp=123456
+```
+
+The script resolves the package root first, then invokes npm publish from a normal Windows path.
+
+## GitHub Release After Manual npm Publish
+
+If a maintainer already published the exact version manually to npm, keep the matching Git tag and GitHub release flow.
+
+The release workflow now checks whether `name@version` already exists on npm:
+
+- if not published yet, it runs `npm publish`
+- if already published, it skips the publish step and still creates the GitHub release
 
 ## Failure Modes
 

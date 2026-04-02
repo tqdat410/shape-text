@@ -47,3 +47,6 @@
 - Added GitHub Actions CI for library validation and browser integration
 - Added a tag-driven release workflow with semver tag guarding and npm-first publish automation
 - Added a maintainer deployment guide covering trusted publishing, token fallback, and branch protection
+- Added a Windows-safe manual `npm run publish:npm` path for first-time local publishes from `\\?\C:\...` terminals
+- Made the tag-driven release workflow idempotent so GitHub releases can still be created after a manual npm publish of the same version
+- Trimmed public GitHub-facing docs so the top-level surface stays focused on the library API and release flow instead of the internal demo app

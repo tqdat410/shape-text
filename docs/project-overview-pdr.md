@@ -6,7 +6,7 @@
 
 ## Problem
 
-Web CSS can wrap text around floated shapes, but it does not provide a solid, portable way to fill text inside arbitrary shapes. We need a small library that solves that exact gap, supports dynamic value-derived layouts such as numeric clocks, and has a real browser workbench for manual verification.
+Web CSS can wrap text around floated shapes, but it does not provide a solid, portable way to fill text inside arbitrary shapes. We need a small library that solves that exact gap and supports dynamic value-derived layouts such as numeric clocks.
 
 ## V1 Requirements
 
@@ -16,7 +16,6 @@ Web CSS can wrap text around floated shapes, but it does not provide a solid, po
 - Support max-fill repeat coverage for decorative glyph fills
 - Support structured text formatting params for size, family, weight, style, and color
 - Support renderer-only shape decoration for fill, border, and shadow
-- Ship a React browser workbench that exercises the library directly
 - Ship with merge-blocking CI and a documented npm release path
 - Return deterministic line geometry
 - Render to SVG
@@ -37,6 +36,5 @@ Web CSS can wrap text around floated shapes, but it does not provide a solid, po
 - The library can repeat source text until the target shape bands are full
 - The library returns line positions inside the target shape
 - The library renders those lines to SVG with optional shape decoration
-- The React workbench covers both shape-source directions and the advanced payload editor path
 - The repository can validate, package, and publish the library through GitHub Actions without undocumented maintainer steps
 - Build and tests pass

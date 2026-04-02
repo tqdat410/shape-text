@@ -7,8 +7,8 @@
 - `shape/*`: shape compilation, text-mask size resolution, cacheable band generation, and optional per-character text-mask region extraction
 - `layout/*`: shape-aware line placement, max-fill repeat coverage, and sequential region flow for per-character text masks
 - `render/*`: SVG serialization
-- `demo/src/*`: React workbench UI, request editing, and SVG viewport presentation
-- `e2e/*`: Playwright browser coverage against the React workbench
+- `demo/*`: internal maintainer workbench and browser verification app
+- `e2e/*`: Playwright browser coverage against the internal verification app
 - `.github/workflows/*`: CI enforcement and tag-driven npm release automation
 
 ## Data Flow
@@ -20,9 +20,8 @@
 5. Route layout through sequential regions when they exist; otherwise use the normal whole-shape flow or the max-fill path
 6. Optionally repeat the source text until the active shape bands are full
 7. Project positioned lines into SVG
-8. In the React workbench, mount the SVG into a scrollable viewport and apply bounded zoom or fit-to-viewport scaling
-9. CI reruns project validation, package smoke checks, and browser coverage before merge
-10. Release tags rerun validation, verify the semver tag, and publish once to npm with Bun compatibility already covered by smoke checks
+8. CI reruns project validation, package smoke checks, and browser coverage before merge
+9. Release tags rerun validation, verify the semver tag, and publish once to npm with Bun compatibility already covered by smoke checks
 
 ## Boundary Decisions
 
@@ -32,6 +31,5 @@
 - Geometry stays shape-specific, not DOM-specific
 - Renderer-only decoration stays out of compile/layout caching
 - Renderer consumes compiled layout output only
-- Workbench zoom is a presentation concern only; it never changes compile or layout results
 - Playwright should assert visible browser behavior, not private controller state
 - Release automation should publish to npm once and treat Bun as a verified consumer path rather than a second registry target

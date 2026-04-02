@@ -57,7 +57,21 @@ jobs:
       - name: Run browser E2E
         run: npm run e2e
 
+      - name: Check whether version already exists on npm
+        id: npm-version
+        run: |
+          package_name=$(node -p "require('./package.json').name")
+          package_version=$(node -p "require('./package.json').version")
+
+          if npm view "${package_name}@${package_version}" version >/dev/null 2>&1; then
+            echo "already_published=true" >> "$GITHUB_OUTPUT"
+            echo "Package ${package_name}@${package_version} already exists on npm"
+          else
+            echo "already_published=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Publish to npm
+        if: steps.npm-version.outputs.already_published != 'true'
         run: |
           if [ -n "${NODE_AUTH_TOKEN}" ]; then
             echo "Publishing with npm token fallback"
@@ -68,6 +82,10 @@ jobs:
           npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Skip npm publish for existing version
+        if: steps.npm-version.outputs.already_published == 'true'
+        run: echo "Skipping npm publish because this version already exists on npm."
 
       - name: Create GitHub release
         run: |
