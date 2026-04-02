@@ -61,13 +61,13 @@ test('switches value-derived rendering between whole-text and per-character regi
   expect(readNumber(await page.getByTestId('summary-line-count').innerText())).toBeGreaterThan(0)
 })
 
-test('rerolls true-random preset text while keeping the same preset family selected', async ({ page }) => {
+test('rerolls fresh random preset text while keeping the same preset family selected', async ({ page }) => {
   await page.goto('/')
 
-  await page.getByLabel('Fill preset').selectOption('ascii-random')
+  await page.getByLabel('Fill preset').selectOption('ascii')
   const firstText = await page.getByLabel('Paragraph text').inputValue()
 
-  await expect(page.getByLabel('Fill preset')).toHaveValue('ascii-random')
+  await expect(page.getByLabel('Fill preset')).toHaveValue('ascii')
   await page.getByRole('button', { name: 'Reroll' }).click()
   const secondText = await page.getByLabel('Paragraph text').inputValue()
 

@@ -83,7 +83,13 @@ async function createConsumerWorkspace(prefix, runner) {
     private: true,
     type: 'module',
   }
-const smokeScript = `import { normalizeTextStyleToFont, prepareTextForLayout } from 'shape-text'
+const smokeScript = `import {
+  createRandomFillText,
+  getRandomFillPreset,
+  normalizeTextStyleToFont,
+  prepareTextForLayout,
+  randomFillPresets,
+} from 'shape-text'
 
 const style = normalizeTextStyleToFont({
   family: 'Arial, sans-serif',
@@ -103,6 +109,27 @@ const prepared = prepareTextForLayout('A B', style.font, {
 
 if (prepared.tokens.length !== 2) {
   throw new Error('Expected two measured tokens for A B')
+}
+
+if (!randomFillPresets.some(preset => preset.id === 'hex')) {
+  throw new Error('Expected random fill presets to expose hex metadata')
+}
+
+const hexPreset = getRandomFillPreset('hex')
+if (!hexPreset || hexPreset.defaultLength <= 0) {
+  throw new Error('Expected getRandomFillPreset to resolve hex metadata')
+}
+
+const fillText = createRandomFillText({
+  preset: 'binary',
+  length: 6,
+  randomInt(max) {
+    return max - 1
+  },
+})
+
+if (fillText !== '111111') {
+  throw new Error('Expected random fill helper to generate binary text from packaged export')
 }
 `
 

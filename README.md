@@ -19,6 +19,10 @@ npm install shape-text
 bun add shape-text
 ```
 
+## Published consumer example
+
+A small React consumer app lives at [examples/react-published-package-consumer](./examples/react-published-package-consumer/). Inside this repo it resolves `shape-text` to the current package surface so it can validate unreleased API additions before the next publish.
+
 ## Ship readiness
 
 Library packaging is validated for both `npm` and `bun`.
@@ -48,14 +52,19 @@ const measurer = createCanvasTextMeasurer()
 const layout = layoutTextInShape({
   text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
   textStyle: {
+    // Swap `family` to any browser-available font stack.
     family: '"Helvetica Neue", Arial, sans-serif',
+    // Increase or decrease `size` with `lineHeight` together.
     size: 16,
+    // Typical weights: 400, 500, 700.
     weight: 700,
+    // `style` can be omitted, `italic`, or `oblique`.
     style: 'italic',
     color: '#111827',
   },
   lineHeight: 22,
   shape: {
+    // Replace `polygon` with `text-mask` for value-derived shapes.
     kind: 'polygon',
     points: [
       { x: 0, y: 0 },
@@ -70,6 +79,7 @@ const layout = layoutTextInShape({
 const svg = renderLayoutToSvg(layout, {
   background: '#fffdf7',
   shapeStyle: {
+    // Replace the palette or omit `shapeStyle` if you only want the text layer.
     backgroundColor: '#dbeafe',
     borderColor: '#94a3b8',
     borderWidth: 2,
@@ -102,12 +112,15 @@ const layout = layoutTextInShape({
     color: '#0f172a',
   },
   lineHeight: 20,
+  // Set `autoFill: false` for normal paragraph flow instead of max-fill repeat coverage.
   autoFill: true,
   shape: {
     kind: 'text-mask',
+    // Replace with any glyph string, for example `SALE`, `09`, or `AB`.
     text: '23',
     font: '700 420px Arial',
     size: {
+      // Use `fixed` with explicit `width` / `height` when you need a forced raster box.
       mode: 'fit-content',
       padding: 10,
     },
@@ -136,6 +149,7 @@ const layout = layoutTextInShape({
       width: 260,
       height: 180,
     },
+    // Omit this or set `whole-text` to treat the full string as one shape region.
     shapeTextMode: 'per-character',
   },
   measurer,
@@ -146,12 +160,34 @@ const layout = layoutTextInShape({
 
 `shape.shapeTextMode` defaults to `'whole-text'`. Set it to `'per-character'` to compile one ordered region per non-space grapheme and flow layout through those regions in shape-text order.
 
+## Random fill helpers
+
+```ts
+import { createRandomFillText } from 'shape-text'
+
+const fillText = createRandomFillText({
+  // Presets: 'ascii', 'binary', 'hex', 'octal', 'symbol'.
+  preset: 'hex',
+  // Omit `length` to use the preset default length.
+  length: 48,
+})
+
+const customFillText = createRandomFillText({
+  // Custom alphabets work too.
+  alphabet: 'ABCD1234',
+  length: 32,
+})
+```
+
 ## Public API
 
 - `createCanvasTextMeasurer()`
+- `createRandomFillText()`
 - `compileShapeForLayout()`
+- `getRandomFillPreset()`
 - `normalizeTextStyleToFont()`
 - `prepareTextForLayout()`
+- `randomFillPresets`
 - `layoutNextLineFromPreparedText()`
 - `layoutNextLineFromRepeatedText()`
 - `getBandIntervalsFromPolygon()`
@@ -167,6 +203,7 @@ const layout = layoutTextInShape({
 - `text-mask` shapes are raster-compiled into reusable line bands. This is the default value-derived path for browser fonts such as `Arial`, and it is designed so callers can precompile `0-9` and `:` for clock-like UIs.
 - `autoFill: true` now means one thing: max-fill stream layout that sweeps every usable interval in reading order.
 - Max fill keeps spaces as normal graphemes instead of stripping them, and it does not fall back to smaller text for leftover pockets.
+- Random fill helpers are content utilities only; they generate source text but do not change layout rules.
 - `text-mask` sizing now lives under `shape.size`. The default `fit-content` mode measures the text mask first and grows the raster box to avoid clipping multi-character shapes such as `23`.
 - `shape.shapeTextMode: 'per-character'` keeps the full text-mask debug view, but also compiles ordered per-character regions for sequential fill across multi-character shape text.
 - `textStyle` is the new data-driven API for size, weight, italic/oblique, family, and default text color. Legacy `font` string input still works.
@@ -202,7 +239,3 @@ npm run e2e:headed
 - Release tags now skip npm publish automatically if that exact version already exists on npm
 - Preferred publish path after the first release is npm Trusted Publisher via GitHub Actions OIDC, with `NPM_TOKEN` as fallback only
 - Maintainer release steps and repository settings live in [docs/deployment-guide.md](./docs/deployment-guide.md)
-- `shapeTextMode` switching between `whole-text` and sequential `per-character` value-derived regions
-- random character-pattern fill presets
-- a payload JSON editor for the live `layout` + `render` request
-- a scrollable full-output SVG viewport with `Zoom out`, `Zoom in`, `100%`, and `Fit` controls

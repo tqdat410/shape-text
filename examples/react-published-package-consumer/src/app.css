@@ -1,0 +1,153 @@
+:root {
+  color: #0f172a;
+  background:
+    radial-gradient(circle at top, #dbeafe 0, #eff6ff 32%, #f8fafc 68%);
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
+code {
+  font-family: "Courier New", monospace;
+}
+
+.page-shell {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 20px 64px;
+}
+
+.hero-panel,
+.example-card {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 24px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+}
+
+.hero-panel {
+  padding: 28px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1;
+}
+
+.hero-copy {
+  margin-top: 12px;
+  max-width: 54ch;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.command-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.command-row code {
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.controls-row {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field span {
+  font-size: 14px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.field select,
+.field textarea,
+.reroll-button {
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
+}
+
+.field select,
+.reroll-button {
+  min-height: 44px;
+  padding: 0 14px;
+}
+
+.field-textarea {
+  margin-top: 16px;
+}
+
+.field textarea {
+  min-height: 108px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+.reroll-button {
+  cursor: pointer;
+  background: #dbeafe;
+  font-weight: 700;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.example-card {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+}
+
+.example-card p {
+  margin-top: 8px;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.svg-frame {
+  overflow: auto;
+  border-radius: 18px;
+  background: #f8fafc;
+}
+
+.svg-frame svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}

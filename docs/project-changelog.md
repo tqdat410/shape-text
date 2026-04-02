@@ -40,7 +40,7 @@
 - Simplified browser E2E to run against the built preview app on a dedicated Playwright port, so local tests are closer to the shipped browser path
 - Simplified repeat fill to one product path: `autoFill: true` now always routes to max fill
 - Removed the workbench fill-mode selector and the medium weight option
-- Changed workbench fill presets from seeded deterministic strings to true-random generation with reroll support
+- Changed workbench fill presets from seeded deterministic strings to fresh runtime-random generation with reroll support
 - Tightened package metadata for library shipping, including `sideEffects`, publish metadata, and LICENSE packaging
 - Cleaned the library build so `dist/` no longer ships compiled test files
 - Added `npm` + `bun` ship-readiness smoke checks for tarball generation and consumer import validation
@@ -51,3 +51,6 @@
 - Made the tag-driven release workflow idempotent so GitHub releases can still be created after a manual npm publish of the same version
 - Trimmed public GitHub-facing docs so the top-level surface stays focused on the library API and release flow instead of the internal demo app
 - Forced GitHub JavaScript actions onto Node 24 in CI/release workflows to avoid upcoming Node 20 runner deprecation noise
+- Added `examples/react-published-package-consumer/`, a small React app that imports `shape-text` from the published registry path and builds under both npm and bun
+- Promoted random fill content generation into the published library surface via reusable preset metadata and `createRandomFillText(...)`
+- Migrated demo random fill generation to consume the library API instead of keeping its own alphabet logic

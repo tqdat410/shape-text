@@ -1,13 +1,12 @@
-import type { PolygonShape } from 'shape-text'
+import {
+  createRandomFillText,
+  randomFillPresets,
+  type PolygonShape,
+  type RandomFillPresetId,
+} from 'shape-text'
 
 export type GeometryPresetId = 'custom' | 'digit-two' | 'rectangle-wide'
-export type FillPresetId =
-  | 'custom'
-  | 'ascii-random'
-  | 'binary-random'
-  | 'hex-random'
-  | 'octal-random'
-  | 'symbol-random'
+export type FillPresetId = 'custom' | RandomFillPresetId
 
 export const defaultParagraphText = [
   'Shape paragraph lets a paragraph travel inside a silhouette instead of wrapping around a float.',
@@ -40,19 +39,6 @@ function createDigitTwoPolygon(width: number, height: number) {
   ]
 }
 
-function getRandomUint32Values(length: number) {
-  if (typeof globalThis.crypto?.getRandomValues === 'function') {
-    return globalThis.crypto.getRandomValues(new Uint32Array(length))
-  }
-
-  const values = new Uint32Array(length)
-  for (let index = 0; index < length; index++) {
-    values[index] = Math.floor(Math.random() * 0x100000000)
-  }
-
-  return values
-}
-
 export const geometryPresets = [
   {
     id: 'digit-two',
@@ -83,16 +69,7 @@ export const geometryPresets = [
 
 export const fillTextPresets = [
   { id: 'custom', label: 'Custom' },
-  {
-    id: 'ascii-random',
-    label: 'ASCII',
-    alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()[]{}<>?/|+-=',
-    length: 96,
-  },
-  { id: 'binary-random', label: 'BINARY', alphabet: '01', length: 128 },
-  { id: 'hex-random', label: 'HEX', alphabet: '0123456789ABCDEF', length: 112 },
-  { id: 'octal-random', label: 'OCTAL', alphabet: '01234567', length: 120 },
-  { id: 'symbol-random', label: 'SYMBOL', alphabet: '<>[]{}()/\\|+-=_*#@~', length: 96 },
+  ...randomFillPresets,
 ] as const
 
 function serializePoints(points: PolygonShape['points']) {
@@ -109,17 +86,9 @@ export function identifyGeometryPresetId(shape: PolygonShape): GeometryPresetId 
 }
 
 export function createFillTextPresetText(id: FillPresetId): string | null {
-  const preset = fillTextPresets.find(candidate => candidate.id === id) ?? fillTextPresets[0]
-  if (preset.id === 'custom') {
+  if (id === 'custom') {
     return null
   }
 
-  const values = getRandomUint32Values(preset.length)
-  let text = ''
-
-  for (let index = 0; index < preset.length; index++) {
-    text += preset.alphabet[values[index]! % preset.alphabet.length]!
-  }
-
-  return text
+  return createRandomFillText({ preset: id })
 }
