@@ -34,11 +34,11 @@ Trusted publishing is the preferred setup after the first successful npm release
 
 1. In npm package settings, add this GitHub repository and the `release.yml` workflow as a trusted publisher.
 2. Keep `id-token: write` permission enabled in the release workflow.
-3. Release by pushing a tag that matches `package.json.version`, for example:
+3. Release by pushing a tag that matches `package.json.version`, for example `v0.2.0`:
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.2.0
+git push origin v0.2.0
 ```
 
 With trusted publishing enabled, `npm publish --provenance --access public` can authenticate through GitHub OIDC without a long-lived npm token.
@@ -79,8 +79,8 @@ npm run e2e
 8. Create and push the matching tag:
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.2.0
+git push origin v0.2.0
 ```
 
 9. Watch the `Release` workflow.
