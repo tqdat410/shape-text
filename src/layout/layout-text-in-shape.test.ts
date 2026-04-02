@@ -99,8 +99,258 @@ describe('layoutTextInShape', () => {
       measurer: createFixedWidthTextMeasurer(),
     })
 
-    expect(layout.lines.map(line => line.text)).toEqual(['ONE ONE', 'ONE ONE', 'ONE ONE'])
+    expect(layout.lines.map(line => line.text)).toEqual(['ONEONEONEO', 'NEONEONEON', 'EONEONEONE'])
     expect(layout.autoFill).toBe(true)
     expect(layout.exhausted).toBe(false)
+  })
+
+  it('keeps spaces in the repeat stream while filling max coverage', () => {
+    const layout = layoutTextInShape({
+      text: 'A B',
+      font: '16px Test Sans',
+      lineHeight: 20,
+      autoFill: true,
+      shape: {
+        kind: 'polygon',
+        points: [
+          { x: 0, y: 0 },
+          { x: 100, y: 0 },
+          { x: 100, y: 60 },
+          { x: 0, y: 60 },
+        ],
+      },
+      measurer: createFixedWidthTextMeasurer(),
+    })
+
+    expect(layout.lines.map(line => line.text)).toEqual(['A BA BA BA', ' BA BA BA ', 'BA BA BA B'])
+    expect(layout.lines.some(line => line.text.includes(' '))).toBe(true)
+  })
+
+  it('supports max fill by sweeping every slot in a band', () => {
+    const layout = layoutTextInCompiledShape({
+      text: 'A B',
+      font: '16px Test Sans',
+      autoFill: true,
+      compiledShape: {
+        kind: 'polygon',
+        source: {
+          kind: 'polygon',
+          points: [
+            { x: 0, y: 0 },
+            { x: 100, y: 0 },
+            { x: 100, y: 8 },
+            { x: 0, y: 8 },
+          ],
+        },
+        bounds: { left: 0, top: 0, right: 100, bottom: 8 },
+        bandHeight: 8,
+        minSlotWidth: 1,
+        bands: [
+          {
+            top: 0,
+            bottom: 8,
+            intervals: [
+              { left: 0, right: 30 },
+              { left: 70, right: 100 },
+            ],
+          },
+        ],
+        debugView: {
+          kind: 'polygon',
+          points: [
+            { x: 0, y: 0 },
+            { x: 100, y: 0 },
+            { x: 100, y: 8 },
+            { x: 0, y: 8 },
+          ],
+        },
+      },
+      measurer: createFixedWidthTextMeasurer(),
+    })
+
+    expect(layout.lines.map(line => [line.text, line.x, line.fillPass])).toEqual([
+      ['A B', 0, 1],
+      ['A B', 70, 1],
+    ])
+  })
+
+  it('fills per-character text-mask regions sequentially while preserving region order', () => {
+    const layout = layoutTextInCompiledShape({
+      text: 'ABCD',
+      font: '16px Test Sans',
+      compiledShape: {
+        kind: 'text-mask',
+        source: {
+          kind: 'text-mask',
+          text: 'A B',
+          font: '700 160px Test Sans',
+          size: {
+            mode: 'fixed',
+            width: 80,
+            height: 20,
+          },
+          shapeTextMode: 'per-character',
+        },
+        bounds: { left: 0, top: 0, right: 80, bottom: 20 },
+        bandHeight: 20,
+        minSlotWidth: 1,
+        bands: [
+          {
+            top: 0,
+            bottom: 20,
+            intervals: [
+              { left: 0, right: 20 },
+              { left: 40, right: 60 },
+            ],
+          },
+        ],
+        regions: [
+          {
+            index: 0,
+            grapheme: 'A',
+            bounds: { left: 0, top: 0, right: 80, bottom: 20 },
+            bands: [{ top: 0, bottom: 20, intervals: [{ left: 0, right: 20 }] }],
+            debugView: {
+              kind: 'text',
+              text: 'A',
+              font: '700 160px Test Sans',
+              x: 0,
+              baseline: 16,
+            },
+          },
+          {
+            index: 1,
+            grapheme: 'B',
+            bounds: { left: 0, top: 0, right: 80, bottom: 20 },
+            bands: [{ top: 0, bottom: 20, intervals: [{ left: 40, right: 60 }] }],
+            debugView: {
+              kind: 'text',
+              text: 'B',
+              font: '700 160px Test Sans',
+              x: 40,
+              baseline: 16,
+            },
+          },
+        ],
+        debugView: {
+          kind: 'text',
+          text: 'A B',
+          font: '700 160px Test Sans',
+          x: 0,
+          baseline: 16,
+        },
+      },
+      measurer: createFixedWidthTextMeasurer(),
+    })
+
+    expect(layout.lines.map(line => [line.text, line.x])).toEqual([
+      ['AB', 0],
+      ['CD', 40],
+    ])
+  })
+
+  it('falls back to whole-shape flow when per-character regions are empty', () => {
+    const layout = layoutTextInCompiledShape({
+      text: 'ABCD',
+      font: '16px Test Sans',
+      compiledShape: {
+        kind: 'text-mask',
+        source: {
+          kind: 'text-mask',
+          text: 'III',
+          font: '700 160px Test Sans',
+          size: {
+            mode: 'fixed',
+            width: 60,
+            height: 20,
+          },
+          shapeTextMode: 'per-character',
+        },
+        bounds: { left: 0, top: 0, right: 60, bottom: 20 },
+        bandHeight: 20,
+        minSlotWidth: 50,
+        bands: [{ top: 0, bottom: 20, intervals: [{ left: 0, right: 60 }] }],
+        regions: [],
+        debugView: {
+          kind: 'text',
+          text: 'III',
+          font: '700 160px Test Sans',
+          x: 0,
+          baseline: 16,
+        },
+      },
+      measurer: createFixedWidthTextMeasurer(),
+    })
+
+    expect(layout.lines.map(line => line.text)).toEqual(['ABCD'])
+  })
+
+  it('rejects empty max-fill input', () => {
+    expect(() =>
+      layoutTextInShape({
+        text: '',
+        font: '16px Test Sans',
+        lineHeight: 20,
+        autoFill: true,
+        shape: {
+          kind: 'polygon',
+          points: [
+            { x: 0, y: 0 },
+            { x: 100, y: 0 },
+            { x: 100, y: 60 },
+            { x: 0, y: 60 },
+          ],
+        },
+        measurer: createFixedWidthTextMeasurer(),
+      }),
+    ).toThrow('stream autoFill requires at least one grapheme')
+  })
+
+  it('keeps non-auto-fill empty text layout unchanged', () => {
+    const layout = layoutTextInShape({
+      text: '',
+      font: '16px Test Sans',
+      lineHeight: 20,
+      shape: {
+        kind: 'polygon',
+        points: [
+          { x: 0, y: 0 },
+          { x: 100, y: 0 },
+          { x: 100, y: 60 },
+          { x: 0, y: 60 },
+        ],
+      },
+      measurer: createFixedWidthTextMeasurer(),
+    })
+
+    expect(layout.lines).toHaveLength(0)
+    expect(layout.exhausted).toBe(true)
+  })
+
+  it('normalizes textStyle into the resolved layout font and color', () => {
+    const layout = layoutTextInShape({
+      text: 'xin chao',
+      textStyle: {
+        family: 'Test Sans',
+        size: 18,
+        weight: 700,
+        style: 'italic',
+        color: '#2563eb',
+      },
+      lineHeight: 20,
+      shape: {
+        kind: 'polygon',
+        points: [
+          { x: 0, y: 0 },
+          { x: 120, y: 0 },
+          { x: 120, y: 40 },
+          { x: 0, y: 40 },
+        ],
+      },
+      measurer: createFixedWidthTextMeasurer(),
+    })
+
+    expect(layout.font).toBe('italic 700 18px Test Sans')
+    expect(layout.textStyle?.color).toBe('#2563eb')
   })
 })

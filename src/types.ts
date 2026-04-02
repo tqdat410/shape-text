@@ -8,6 +8,23 @@ export type Interval = {
   right: number
 }
 
+export type TextMaskShapeTextMode = 'whole-text' | 'per-character'
+export type TextMaskShapeSizeMode = 'fit-content' | 'fixed'
+
+export type TextMaskShapeFitContentSize = {
+  mode?: 'fit-content'
+  padding?: number
+}
+
+export type TextMaskShapeFixedSize = {
+  mode: 'fixed'
+  width: number
+  height: number
+  padding?: number
+}
+
+export type TextMaskShapeSize = TextMaskShapeFitContentSize | TextMaskShapeFixedSize
+
 export type PolygonShape = {
   kind: 'polygon'
   points: ShapeTextPoint[]
@@ -17,9 +34,8 @@ export type TextMaskShape = {
   kind: 'text-mask'
   text: string
   font: string
-  width: number
-  height: number
-  padding?: number
+  size?: TextMaskShapeSize
+  shapeTextMode?: TextMaskShapeTextMode
   maskScale?: number
   alphaThreshold?: number
 }
@@ -28,6 +44,51 @@ export type ShapeInput = PolygonShape | TextMaskShape
 
 export type TextMeasurer = {
   measureText(text: string, font: string): number
+}
+
+export type TextStyleInput = {
+  family: string
+  size: number
+  weight?: number | string
+  style?: 'normal' | 'italic' | 'oblique'
+  color?: string
+}
+
+export type ResolvedTextStyle = {
+  font: string
+  family?: string
+  size?: number
+  weight?: number | string
+  style?: 'normal' | 'italic' | 'oblique'
+  color?: string
+}
+
+export type ShapeShadowInput = {
+  color?: string
+  blur: number
+  offsetX?: number
+  offsetY?: number
+}
+
+export type ResolvedShapeShadow = {
+  color: string
+  blur: number
+  offsetX: number
+  offsetY: number
+}
+
+export type ShapeStyleInput = {
+  backgroundColor?: string
+  borderColor?: string
+  borderWidth?: number
+  shadow?: ShapeShadowInput
+}
+
+export type ResolvedShapeStyle = {
+  backgroundColor?: string
+  borderColor: string
+  borderWidth: number
+  shadow?: ResolvedShapeShadow
 }
 
 export type PreparedLayoutToken = {
@@ -61,6 +122,8 @@ export type ShapeTextLine = LayoutLineRange & {
   top: number
   baseline: number
   slot: Interval
+  font?: string
+  fillPass?: 1 | 2
 }
 
 export type ShapeBounds = {
@@ -89,6 +152,14 @@ export type CompiledShapeDebugView =
       baseline: number
     }
 
+export type CompiledShapeRegion = {
+  index: number
+  grapheme: string
+  bounds: ShapeBounds
+  bands: CompiledShapeBand[]
+  debugView: CompiledShapeDebugView
+}
+
 export type CompiledShapeBands = {
   kind: ShapeInput['kind']
   source: ShapeInput
@@ -96,11 +167,13 @@ export type CompiledShapeBands = {
   bandHeight: number
   minSlotWidth: number
   bands: CompiledShapeBand[]
+  regions?: CompiledShapeRegion[]
   debugView: CompiledShapeDebugView
 }
 
 export type ShapeTextLayout = {
   font: string
+  textStyle?: ResolvedTextStyle
   lineHeight: number
   shape: ShapeInput
   compiledShape: CompiledShapeBands
@@ -118,17 +191,24 @@ export type CompileShapeForLayoutOptions = {
 
 export type LayoutTextInCompiledShapeOptions = {
   text: string
-  font: string
   compiledShape: CompiledShapeBands
   measurer: TextMeasurer
   align?: 'left' | 'center'
   baselineRatio?: number
   autoFill?: boolean
-}
+} & (
+  | {
+      font: string
+      textStyle?: TextStyleInput
+    }
+  | {
+      font?: string
+      textStyle: TextStyleInput
+    }
+)
 
 export type LayoutTextInShapeOptions = {
   text: string
-  font: string
   lineHeight: number
   shape: ShapeInput
   measurer: TextMeasurer
@@ -136,7 +216,16 @@ export type LayoutTextInShapeOptions = {
   minSlotWidth?: number
   baselineRatio?: number
   autoFill?: boolean
-}
+} & (
+  | {
+      font: string
+      textStyle?: TextStyleInput
+    }
+  | {
+      font?: string
+      textStyle: TextStyleInput
+    }
+)
 
 export type RenderLayoutToSvgOptions = {
   padding?: number
@@ -144,5 +233,6 @@ export type RenderLayoutToSvgOptions = {
   textFill?: string
   shapeStroke?: string
   shapeFill?: string
+  shapeStyle?: ShapeStyleInput
   showShape?: boolean
 }

@@ -4,23 +4,34 @@
 
 - `text/*`: text preparation and streamed line breaking
 - `geometry/*`: polygon band sampling and interval extraction
-- `shape/*`: shape compilation and cacheable band generation
-- `layout/*`: shape-aware line placement and repeat-fill policies
+- `shape/*`: shape compilation, text-mask size resolution, cacheable band generation, and optional per-character text-mask region extraction
+- `layout/*`: shape-aware line placement, max-fill repeat coverage, and sequential region flow for per-character text masks
 - `render/*`: SVG serialization
+- `demo/src/*`: React workbench UI, request editing, and SVG viewport presentation
+- `e2e/*`: Playwright browser coverage against the React workbench
+- `.github/workflows/*`: CI enforcement and tag-driven npm release automation
 
 ## Data Flow
 
-1. Normalize and prepare text
-2. Compile the input shape into reusable line bands
-3. Compute allowed intervals for each band
-4. Pick the widest interval
-5. Stream the next line into that width
-6. Optionally repeat the source text until bands are full
+1. Normalize text formatting into a canonical font string
+2. Resolve text-mask sizing into either `fit-content` or fixed bounds, then compile the input shape into reusable line bands
+3. For `text-mask` shapes with `shapeTextMode: 'per-character'`, also compile ordered non-space grapheme regions from the same mask source
+4. Compute allowed intervals for each band or per-character region
+5. Route layout through sequential regions when they exist; otherwise use the normal whole-shape flow or the max-fill path
+6. Optionally repeat the source text until the active shape bands are full
 7. Project positioned lines into SVG
+8. In the React workbench, mount the SVG into a scrollable viewport and apply bounded zoom or fit-to-viewport scaling
+9. CI reruns project validation, package smoke checks, and browser coverage before merge
+10. Release tags rerun validation, verify the semver tag, and publish once to npm with Bun compatibility already covered by smoke checks
 
 ## Boundary Decisions
 
-- Text measurement stays replaceable through `TextMeasurer`
-- Shape compilation stays separate from content flow so glyph shapes can be cached
+- Text measurement stays replaceable through the layout measurer interface
+- Layout-affecting text style stays in the layout API
+- Shape compilation stays separate from content flow so resolved text-mask bounds, glyph shapes, and per-character regions can be cached
 - Geometry stays shape-specific, not DOM-specific
+- Renderer-only decoration stays out of compile/layout caching
 - Renderer consumes compiled layout output only
+- Workbench zoom is a presentation concern only; it never changes compile or layout results
+- Playwright should assert visible browser behavior, not private controller state
+- Release automation should publish to npm once and treat Bun as a verified consumer path rather than a second registry target

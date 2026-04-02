@@ -1,6 +1,7 @@
 export type {
   CompiledShapeBand,
   CompiledShapeBands,
+  CompiledShapeRegion,
   CompileShapeForLayoutOptions,
   Interval,
   LayoutCursor,
@@ -11,16 +12,28 @@ export type {
   PreparedLayoutText,
   PreparedLayoutToken,
   RenderLayoutToSvgOptions,
+  ResolvedShapeShadow,
+  ResolvedShapeStyle,
+  ResolvedTextStyle,
   ShapeInput,
   ShapeBounds,
+  ShapeShadowInput,
+  ShapeStyleInput,
   ShapeTextLayout,
   ShapeTextLine,
   ShapeTextPoint,
   TextMaskShape,
+  TextMaskShapeFixedSize,
+  TextMaskShapeFitContentSize,
+  TextMaskShapeSize,
+  TextMaskShapeSizeMode,
+  TextMaskShapeTextMode,
+  TextStyleInput,
   TextMeasurer,
 } from './types.js'
 
 export { createCanvasTextMeasurer } from './text/create-canvas-text-measurer.js'
+export { normalizeTextStyleToFont, resolveLayoutTextStyle } from './text/normalize-text-style-to-font.js'
 export { prepareTextForLayout } from './text/prepare-text-for-layout.js'
 export { layoutNextLineFromPreparedText } from './text/layout-next-line-from-prepared-text.js'
 export { layoutNextLineFromRepeatedText } from './text/layout-next-line-from-repeated-text.js'

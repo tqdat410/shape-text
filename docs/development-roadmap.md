@@ -9,9 +9,15 @@
 
 ## Phase 2
 
-- Add center alignment polish
 - Add alpha-mask adapter
-- Add playground/demo page
+- Completed on 2026-04-02:
+  - Add React playground/demo page
+  - Replace fixture-driven browser tests with workbench-driven browser tests
+- Simplify repeat fill to max-fill-only product behavior
+- Harden npm/bun release readiness for shipping the library as a clean consumable package
+- Add GitHub Actions CI and tag-driven npm release automation with Bun compatibility checks
+- Remaining:
+  - Add alpha-mask adapter
 
 ## Phase 3
 
