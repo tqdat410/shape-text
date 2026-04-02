@@ -21,5 +21,9 @@
 - Added renderer-side `shapeStyle` API for shape fill, border, and shadow
 - Added `autoFillMode: 'dense'` for whitespace-stripped grapheme repeat fill inside compiled shape bands
 - Added `fillStrategy: 'max'` for all-slot glyph coverage without mini-font fallback, while preserving spaces in the repeat stream
+- Added `shape.shapeTextMode: 'per-character'` for ordered non-space text-mask regions and sequential per-region layout flow
+- Replaced top-level text-mask `width` / `height` / `padding` with `shape.size`, defaulting text-mask sizing to `fit-content`
+- Added demo payload editing, freeform glyph-shape text input, and predefined random character-pattern fill presets
+- Added a scrollable demo full-output SVG viewport with zoom in/out, reset, and fit controls for wide or tall renders
 - Kept legacy `font`, `textFill`, `shapeFill`, and `shapeStroke` compatibility paths
 - Extended local demo and Playwright coverage for style and decoration controls

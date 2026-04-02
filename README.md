@@ -83,13 +83,44 @@ const layout = layoutTextInShape({
     kind: 'text-mask',
     text: '2',
     font: '700 420px Arial',
-    width: 340,
-    height: 460,
-    padding: 10,
+    size: {
+      mode: 'fit-content',
+      padding: 10,
+    },
   },
   measurer,
 })
 ```
+
+## Sequential text-mask regions
+
+```ts
+const layout = layoutTextInShape({
+  text: 'ABCDEFGHIJ',
+  textStyle: {
+    family: 'Arial, sans-serif',
+    size: 14,
+    weight: 700,
+  },
+  lineHeight: 18,
+  shape: {
+    kind: 'text-mask',
+    text: 'AB',
+    font: '700 160px Arial',
+    size: {
+      mode: 'fixed',
+      width: 260,
+      height: 180,
+    },
+    shapeTextMode: 'per-character',
+  },
+  measurer,
+})
+```
+
+`shape.size` defaults to `{ mode: 'fit-content', padding: 0 }`. Use `mode: 'fixed'` only when you need to force the glyph mask into an explicit raster box.
+
+`shape.shapeTextMode` defaults to `'whole-text'`. Set it to `'per-character'` to compile one ordered region per non-space grapheme and flow layout through those regions in shape-text order.
 
 ## Public API
 
@@ -112,6 +143,8 @@ const layout = layoutTextInShape({
 - `autoFill: true` repeats the source text until the available shape bands are full.
 - `autoFillMode: 'words'` is the default readable repeat behavior. `autoFillMode: 'dense'` strips whitespace and breaks at grapheme boundaries to pack shapes harder for decorative fills.
 - `fillStrategy: 'max'` switches to an all-slots pass that fills every usable interval in reading order. It keeps spaces as normal graphemes instead of stripping them, and it does not fall back to smaller text for leftover pockets.
+- `text-mask` sizing now lives under `shape.size`. The default `fit-content` mode measures the text mask first and grows the raster box to avoid clipping multi-character shapes such as `23`.
+- `shape.shapeTextMode: 'per-character'` keeps the full text-mask debug view, but also compiles ordered per-character regions for sequential fill across multi-character shape text.
 - `textStyle` is the new data-driven API for size, weight, italic/oblique, family, and default text color. Legacy `font` string input still works.
 - `shapeStyle` lives in `renderLayoutToSvg()` because fill, border, and shadow do not affect line breaking or shape compilation.
 - For late-loading web fonts, compile after the font is ready if you want immediate cache reuse. The compiler skips cache writes until `document.fonts.check()` reports the font as ready.
@@ -166,3 +199,12 @@ For a fast local loop without rebuilding first:
 npm run build
 npm run demo:dev
 ```
+
+The demo now includes:
+
+- direct `shape.text` editing for text-mask scenarios
+- `shape.size.mode` switching between `fit-content` and `fixed`
+- `shapeTextMode` switching between `whole-text` and sequential `per-character` text-mask regions
+- a payload JSON editor for the live `layout` + `render` request
+- a scrollable full-output SVG viewport with `Zoom out`, `Zoom in`, `100%`, and `Fit` controls
+- predefined random character-pattern fill presets for quick repeat-fill experiments
