@@ -22,14 +22,14 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "check": "npm run typecheck && npm run test",
-    "e2e": "playwright test",
-    "e2e:ui": "playwright test --ui",
-    "e2e:headed": "playwright test --headed",
-    "e2e:debug": "playwright test --debug",
-    "e2e:serve": "npm run build && node ./scripts/serve-static-e2e.mjs",
-    "e2e:serve:dev": "node ./scripts/serve-static-e2e.mjs",
-    "demo": "npm run e2e:serve",
-    "demo:dev": "npm run e2e:serve:dev"
+    "e2e": "node ./node_modules/@playwright/test/cli.js test",
+    "e2e:ui": "node ./node_modules/@playwright/test/cli.js test --ui",
+    "e2e:headed": "node ./node_modules/@playwright/test/cli.js test --headed",
+    "e2e:debug": "node ./node_modules/@playwright/test/cli.js test --debug",
+    "e2e:serve": "node ./scripts/run-e2e-serve.mjs",
+    "e2e:serve:dev": "node ./scripts/run-e2e-serve.mjs --skip-build",
+    "demo": "node ./scripts/run-e2e-serve.mjs",
+    "demo:dev": "node ./scripts/run-e2e-serve.mjs --skip-build"
   },
   "keywords": [
     "svg",

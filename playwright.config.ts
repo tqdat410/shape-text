@@ -13,7 +13,7 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'npm run e2e:serve',
+    command: 'node ./scripts/run-e2e-serve.mjs',
     url: `${baseURL}/`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
