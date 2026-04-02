@@ -2,7 +2,16 @@ const { spawn } = require('node:child_process')
 const path = require('node:path')
 
 function getPackageRoot() {
-  const packageJsonPath = String(process.env.npm_package_json ?? '').replace(/^\\\\\?\\/, '')
+  let packageJsonPath = String(process.env.npm_package_json ?? '')
+
+  if (
+    packageJsonPath.charCodeAt(0) === 92 &&
+    packageJsonPath.charCodeAt(1) === 92 &&
+    packageJsonPath.charCodeAt(2) === 63 &&
+    packageJsonPath.charCodeAt(3) === 92
+  ) {
+    packageJsonPath = packageJsonPath.slice(4)
+  }
 
   if (!packageJsonPath) {
     throw new Error('npm_package_json is missing; cannot resolve package root')
