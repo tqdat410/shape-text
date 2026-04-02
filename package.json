@@ -49,7 +49,8 @@
     "demo:build": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('scripts/run-demo-app.mjs',['--build'])\"",
     "demo:preview": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('scripts/run-demo-app.mjs',['--preview'])\"",
     "prepack": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('scripts/run-library-build.mjs')\"",
-    "ship:check": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('scripts/run-library-ship-check.mjs')\""
+    "ship:check": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('scripts/run-library-ship-check.mjs')\"",
+    "release:check-tag": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('scripts/validate-release-tag.mjs', process.argv.slice(1))\""
   },
   "keywords": [
     "svg",

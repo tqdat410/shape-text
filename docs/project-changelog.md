@@ -44,3 +44,6 @@
 - Tightened package metadata for library shipping, including `sideEffects`, publish metadata, and LICENSE packaging
 - Cleaned the library build so `dist/` no longer ships compiled test files
 - Added `npm` + `bun` ship-readiness smoke checks for tarball generation and consumer import validation
+- Added GitHub Actions CI for library validation and browser integration
+- Added a tag-driven release workflow with semver tag guarding and npm-first publish automation
+- Added a maintainer deployment guide covering trusted publishing, token fallback, and branch protection

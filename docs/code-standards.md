@@ -25,3 +25,6 @@
 - Test browser-only glyph masking and workbench wiring through Playwright, not Node mocks
 - Keep tests focused on behavior, not implementation details
 - Do not expose private browser globals just to make E2E easier
+- Keep `npm run ship:check` green before any release tag
+- Release tags must match `package.json.version`
+- CI must be required on `main` before merge

@@ -17,6 +17,7 @@ Web CSS can wrap text around floated shapes, but it does not provide a solid, po
 - Support structured text formatting params for size, family, weight, style, and color
 - Support renderer-only shape decoration for fill, border, and shadow
 - Ship a React browser workbench that exercises the library directly
+- Ship with merge-blocking CI and a documented npm release path
 - Return deterministic line geometry
 - Render to SVG
 - Support Latin/Vietnamese first
@@ -37,4 +38,5 @@ Web CSS can wrap text around floated shapes, but it does not provide a solid, po
 - The library returns line positions inside the target shape
 - The library renders those lines to SVG with optional shape decoration
 - The React workbench covers both shape-source directions and the advanced payload editor path
+- The repository can validate, package, and publish the library through GitHub Actions without undocumented maintainer steps
 - Build and tests pass

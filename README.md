@@ -221,6 +221,10 @@ Playwright now targets the React workbench in `demo/`, so browser coverage runs 
 - Published package surface is limited to `dist/`, `README.md`, and `LICENSE`
 - `npm pack` / `npm publish` trigger a clean library rebuild through `prepack`
 - Build output excludes test files so the tarball stays library-only
+- PR validation now runs through `.github/workflows/ci.yml`
+- Tag releases now run through `.github/workflows/release.yml`
+- Preferred publish path is npm Trusted Publisher via GitHub Actions OIDC, with `NPM_TOKEN` as fallback only
+- Maintainer release steps and repository settings live in [docs/deployment-guide.md](./docs/deployment-guide.md)
 
 ## Local Demo UI
 
