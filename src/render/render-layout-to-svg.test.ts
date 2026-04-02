@@ -111,7 +111,7 @@ describe('renderLayoutToSvg', () => {
     expect(svg).not.toContain('fill="#2563eb"')
   })
 
-  it('renders line-level font overrides for residual max-fill passes', () => {
+  it('renders line-level font overrides when a line provides its own font', () => {
     const svg = renderLayoutToSvg({
       font: '16px Test Sans',
       lineHeight: 20,
@@ -177,8 +177,6 @@ describe('renderLayoutToSvg', () => {
       ],
       exhausted: false,
       autoFill: true,
-      autoFillMode: 'dense',
-      fillStrategy: 'max',
     } satisfies ShapeTextLayout)
 
     expect(svg).toContain('style="font:16px Test Sans;"')
@@ -287,8 +285,6 @@ describe('renderLayoutToSvg', () => {
       lines: [],
       exhausted: true,
       autoFill: false,
-      autoFillMode: 'words',
-      fillStrategy: 'flow',
     } satisfies ShapeTextLayout)
 
     expect(svg).toContain('<svg')

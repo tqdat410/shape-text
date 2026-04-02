@@ -1,10 +1,8 @@
 export type {
-  AutoFillMode,
   CompiledShapeBand,
   CompiledShapeBands,
   CompiledShapeRegion,
   CompileShapeForLayoutOptions,
-  FillStrategy,
   Interval,
   LayoutCursor,
   LayoutLineRange,

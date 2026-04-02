@@ -1,14 +1,10 @@
 import type {
-  AutoFillMode,
   CompiledShapeBands,
   LayoutCursor,
   PreparedLayoutText,
-  PreparedLayoutToken,
   ShapeTextLine,
 } from '../types.js'
 import { layoutNextLineFromPreparedText } from '../text/layout-next-line-from-prepared-text.js'
-import { layoutNextLineFromRepeatedText } from '../text/layout-next-line-from-repeated-text.js'
-import { layoutDenseFillPass } from './layout-dense-fill-pass.js'
 
 function pickWidestInterval(intervals: CompiledShapeBands['bands'][number]['intervals']) {
   let best = intervals[0]!
@@ -25,10 +21,7 @@ function pickWidestInterval(intervals: CompiledShapeBands['bands'][number]['inte
 
 type LayoutFlowLinesInCompiledShapeOptions = {
   compiledShape: CompiledShapeBands
-  prepared?: PreparedLayoutText
-  densePattern?: PreparedLayoutToken
-  autoFill: boolean
-  autoFillMode: AutoFillMode
+  prepared: PreparedLayoutText
   align: 'left' | 'center'
   baselineRatio: number
   startCursor: LayoutCursor
@@ -50,32 +43,11 @@ export function layoutFlowLinesInCompiledShape(
     }
 
     const slot = pickWidestInterval(band.intervals)
-    if (options.autoFill && options.autoFillMode === 'dense') {
-      const denseLine =
-        layoutDenseFillPass({
-          compiledShape: {
-            ...options.compiledShape,
-            bands: [{ ...band, intervals: [slot] }],
-          },
-          densePattern: options.densePattern!,
-          startOffset: cursor.tokenIndex,
-          align: options.align,
-          baselineRatio: options.baselineRatio,
-          allSlots: false,
-        }).lines[0] ?? null
-
-      if (denseLine === null) {
-        break
-      }
-
-      lines.push(denseLine)
-      cursor = denseLine.end
-      continue
-    }
-
-    const line = options.autoFill
-      ? layoutNextLineFromRepeatedText(options.prepared!, cursor, slot.right - slot.left)
-      : layoutNextLineFromPreparedText(options.prepared!, cursor, slot.right - slot.left)
+    const line = layoutNextLineFromPreparedText(
+      options.prepared,
+      cursor,
+      slot.right - slot.left,
+    )
 
     if (line === null) {
       break

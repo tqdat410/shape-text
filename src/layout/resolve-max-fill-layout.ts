@@ -39,7 +39,5 @@ export function resolveMaxFillLayout(
     lines: pass.lines,
     exhausted: false,
     autoFill: true,
-    autoFillMode: 'stream',
-    fillStrategy: 'max',
   }
 }

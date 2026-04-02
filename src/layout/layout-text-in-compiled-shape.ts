@@ -1,4 +1,4 @@
-import type { AutoFillMode, FillStrategy, LayoutTextInCompiledShapeOptions, ShapeTextLayout } from '../types.js'
+import type { LayoutTextInCompiledShapeOptions, ShapeTextLayout } from '../types.js'
 import { resolveFlowLayout } from './resolve-flow-layout.js'
 import { resolveMaxFillLayout } from './resolve-max-fill-layout.js'
 import {
@@ -9,17 +9,13 @@ import {
 export function layoutTextInCompiledShape(
   options: LayoutTextInCompiledShapeOptions,
 ): ShapeTextLayout {
-  const autoFill = options.autoFill ?? false
-  const autoFillMode: AutoFillMode = autoFill ? (options.autoFillMode ?? 'words') : 'words'
-  const fillStrategy: FillStrategy = autoFill ? (options.fillStrategy ?? 'flow') : 'flow'
-
   if (hasSequentialShapeRegions(options.compiledShape)) {
     return resolveSequentialShapeRegions(options)
   }
 
-  if (fillStrategy === 'max') {
+  if (options.autoFill === true) {
     return resolveMaxFillLayout(options)
   }
 
-  return resolveFlowLayout(options, autoFillMode)
+  return resolveFlowLayout(options)
 }

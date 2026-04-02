@@ -1,0 +1,64 @@
+:root {
+  color-scheme: light;
+  font-family: "Instrument Sans", "Segoe UI", sans-serif;
+  background: #eff3f6;
+  color: #10243c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(circle at top left, rgba(174, 239, 220, 0.38), transparent 32%),
+    linear-gradient(180deg, #f7f5ee 0%, #e8eef4 100%);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+textarea,
+input[type="text"],
+input[type="number"],
+select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: 1px solid #cad5e0;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+textarea {
+  min-height: 160px;
+  resize: vertical;
+}
+
+input[type="range"] {
+  width: 100%;
+}
+
+button {
+  border: 1px solid #c1cfda;
+  border-radius: 999px;
+  background: white;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+details summary {
+  cursor: pointer;
+  font-weight: 700;
+}

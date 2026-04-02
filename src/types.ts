@@ -84,9 +84,6 @@ export type ShapeStyleInput = {
   shadow?: ShapeShadowInput
 }
 
-export type AutoFillMode = 'words' | 'dense' | 'stream'
-export type FillStrategy = 'flow' | 'max'
-
 export type ResolvedShapeStyle = {
   backgroundColor?: string
   borderColor: string
@@ -184,8 +181,6 @@ export type ShapeTextLayout = {
   lines: ShapeTextLine[]
   exhausted: boolean
   autoFill: boolean
-  autoFillMode?: AutoFillMode
-  fillStrategy?: FillStrategy
 }
 
 export type CompileShapeForLayoutOptions = {
@@ -201,8 +196,6 @@ export type LayoutTextInCompiledShapeOptions = {
   align?: 'left' | 'center'
   baselineRatio?: number
   autoFill?: boolean
-  autoFillMode?: AutoFillMode
-  fillStrategy?: FillStrategy
 } & (
   | {
       font: string
@@ -223,8 +216,6 @@ export type LayoutTextInShapeOptions = {
   minSlotWidth?: number
   baselineRatio?: number
   autoFill?: boolean
-  autoFillMode?: AutoFillMode
-  fillStrategy?: FillStrategy
 } & (
   | {
       font: string

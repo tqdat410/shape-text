@@ -3,7 +3,7 @@ import { compileShapeForLayout } from '../shape/compile-shape-for-layout.js'
 import { layoutTextInCompiledShape } from './layout-text-in-compiled-shape.js'
 
 function resolveCompileMinSlotWidth(options: LayoutTextInShapeOptions): number | undefined {
-  if (options.fillStrategy !== 'max' || options.autoFill !== true) {
+  if (options.autoFill !== true) {
     return options.minSlotWidth
   }
 
@@ -31,8 +31,6 @@ export function layoutTextInShape(options: LayoutTextInShapeOptions): ShapeTextL
       align: options.align,
       baselineRatio: options.baselineRatio,
       autoFill: options.autoFill,
-      autoFillMode: options.autoFillMode,
-      fillStrategy: options.fillStrategy,
     })
   }
 
@@ -44,7 +42,5 @@ export function layoutTextInShape(options: LayoutTextInShapeOptions): ShapeTextL
     align: options.align,
     baselineRatio: options.baselineRatio,
     autoFill: options.autoFill,
-    autoFillMode: options.autoFillMode,
-    fillStrategy: options.fillStrategy,
   })
 }

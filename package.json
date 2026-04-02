@@ -1,10 +1,12 @@
 {
   "name": "shape-text",
   "version": "0.1.0",
-  "description": "Browser-first TypeScript library for laying out text inside polygon shapes and rendering to SVG.",
+  "description": "Browser-first TypeScript library for shape-paragraph layout inside geometry and value-derived shapes, rendered to SVG.",
   "type": "module",
   "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -12,29 +14,48 @@
       "default": "./dist/index.js"
     }
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tqdat410/shape-text.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tqdat410/shape-text/issues"
+  },
+  "homepage": "https://github.com/tqdat410/shape-text#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18",
+    "bun": ">=1.0.0"
+  },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "check": "npm run typecheck && npm run test",
-    "e2e": "node ./node_modules/@playwright/test/cli.js test",
-    "e2e:ui": "node ./node_modules/@playwright/test/cli.js test --ui",
-    "e2e:headed": "node ./node_modules/@playwright/test/cli.js test --headed",
-    "e2e:debug": "node ./node_modules/@playwright/test/cli.js test --debug",
-    "e2e:serve": "node ./scripts/run-e2e-serve.mjs",
-    "e2e:serve:dev": "node ./scripts/run-e2e-serve.mjs --skip-build",
-    "demo": "node ./scripts/run-e2e-serve.mjs",
-    "demo:dev": "node ./scripts/run-e2e-serve.mjs --skip-build"
+    "build": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('scripts/run-library-build.mjs')\"",
+    "typecheck": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('node_modules/typescript/bin/tsc',['-p','tsconfig.json','--noEmit'])\"",
+    "test": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('node_modules/vitest/vitest.mjs',['run'])\"",
+    "test:coverage": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('node_modules/vitest/vitest.mjs',['run','--coverage'])\"",
+    "check": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('scripts/run-project-check.mjs')\"",
+    "e2e": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('node_modules/@playwright/test/cli.js',['test'])\"",
+    "e2e:ui": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('node_modules/@playwright/test/cli.js',['test','--ui'])\"",
+    "e2e:headed": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('node_modules/@playwright/test/cli.js',['test','--headed'])\"",
+    "e2e:debug": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('node_modules/@playwright/test/cli.js',['test','--debug'])\"",
+    "demo": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('scripts/run-demo-app.mjs')\"",
+    "demo:dev": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('scripts/run-demo-app.mjs')\"",
+    "demo:build": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('scripts/run-demo-app.mjs',['--build'])\"",
+    "demo:preview": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('scripts/run-demo-app.mjs',['--preview'])\"",
+    "prepack": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('scripts/run-library-build.mjs')\"",
+    "ship:check": "node -e \"const path=require('node:path');const pkg=(process.env.npm_package_json||'').replace(/^\\\\\\\\\\?\\\\/,'');require(path.join(path.dirname(pkg),'scripts','run-node-script-from-package-root.cjs')).run('scripts/run-library-ship-check.mjs')\""
   },
   "keywords": [
     "svg",
     "text-layout",
     "shape-text",
+    "shape-paragraph",
     "polygon",
     "typography"
   ],
@@ -42,8 +63,15 @@
   "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.58.2",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^5.1.0",
     "@vitest/coverage-v8": "^3.2.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "typescript": "^5.9.3",
+    "vite": "^7.1.12",
     "vitest": "^3.2.4"
   }
 }

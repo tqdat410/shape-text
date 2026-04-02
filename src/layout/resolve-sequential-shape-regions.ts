@@ -1,14 +1,11 @@
 import type {
-  AutoFillMode,
   CompiledShapeBands,
   CompiledShapeRegion,
-  FillStrategy,
   LayoutCursor,
   LayoutTextInCompiledShapeOptions,
   ShapeTextLayout,
 } from '../types.js'
 import { resolveLayoutTextStyle } from '../text/normalize-text-style-to-font.js'
-import { prepareDenseRepeatFillPattern } from '../text/prepare-dense-repeat-fill-pattern.js'
 import { prepareStreamRepeatFillPattern } from '../text/prepare-stream-repeat-fill-pattern.js'
 import { prepareTextForLayout } from '../text/prepare-text-for-layout.js'
 import { layoutDenseFillPass } from './layout-dense-fill-pass.js'
@@ -44,19 +41,18 @@ export function resolveSequentialShapeRegions(
   options: LayoutTextInCompiledShapeOptions,
 ): ShapeTextLayout {
   const autoFill = options.autoFill ?? false
-  const autoFillMode: AutoFillMode = autoFill ? (options.autoFillMode ?? 'words') : 'words'
-  const fillStrategy: FillStrategy = autoFill ? (options.fillStrategy ?? 'flow') : 'flow'
   const resolvedTextStyle = resolveLayoutTextStyle({
     font: options.font,
     textStyle: options.textStyle,
   })
   const align = options.align ?? 'left'
   const baselineRatio = options.baselineRatio ?? 0.8
-  const compiledShape =
-    fillStrategy === 'max' ? ensureMaxFillCompiledShape(options.compiledShape) : options.compiledShape
+  const compiledShape = autoFill
+    ? ensureMaxFillCompiledShape(options.compiledShape)
+    : options.compiledShape
   const regions = compiledShape.regions ?? []
 
-  if (fillStrategy === 'max') {
+  if (autoFill) {
     const streamPattern = prepareStreamRepeatFillPattern(
       options.text,
       resolvedTextStyle.font,
@@ -91,19 +87,14 @@ export function resolveSequentialShapeRegions(
       lines,
       exhausted: false,
       autoFill: true,
-      autoFillMode: 'stream',
-      fillStrategy: 'max',
     }
   }
 
-  const prepared =
-    autoFillMode === 'dense'
-      ? undefined
-      : prepareTextForLayout(options.text, resolvedTextStyle.font, options.measurer)
-  const densePattern =
-    autoFillMode === 'dense'
-      ? prepareDenseRepeatFillPattern(options.text, resolvedTextStyle.font, options.measurer)
-      : undefined
+  const prepared = prepareTextForLayout(
+    options.text,
+    resolvedTextStyle.font,
+    options.measurer,
+  )
   const lines = []
   let cursor: LayoutCursor = { tokenIndex: 0, graphemeIndex: 0 }
 
@@ -112,9 +103,6 @@ export function resolveSequentialShapeRegions(
     const result = layoutFlowLinesInCompiledShape({
       compiledShape: regionShape,
       prepared,
-      densePattern,
-      autoFill,
-      autoFillMode,
       align,
       baselineRatio,
       startCursor: cursor,
@@ -136,9 +124,7 @@ export function resolveSequentialShapeRegions(
     compiledShape,
     bounds: compiledShape.bounds,
     lines,
-    exhausted: autoFill ? autoFillMode === 'dense' ? false : prepared!.tokens.length === 0 : cursor.tokenIndex >= prepared!.tokens.length,
-    autoFill,
-    autoFillMode,
-    fillStrategy: 'flow',
+    exhausted: cursor.tokenIndex >= prepared.tokens.length,
+    autoFill: false,
   }
 }

@@ -99,19 +99,17 @@ describe('layoutTextInShape', () => {
       measurer: createFixedWidthTextMeasurer(),
     })
 
-    expect(layout.lines.map(line => line.text)).toEqual(['ONE ONE', 'ONE ONE', 'ONE ONE'])
+    expect(layout.lines.map(line => line.text)).toEqual(['ONEONEONEO', 'NEONEONEON', 'EONEONEONE'])
     expect(layout.autoFill).toBe(true)
-    expect(layout.autoFillMode).toBe('words')
     expect(layout.exhausted).toBe(false)
   })
 
-  it('supports dense auto-fill by ignoring spaces and word boundaries', () => {
+  it('keeps spaces in the repeat stream while filling max coverage', () => {
     const layout = layoutTextInShape({
-      text: 'ONE',
+      text: 'A B',
       font: '16px Test Sans',
       lineHeight: 20,
       autoFill: true,
-      autoFillMode: 'dense',
       shape: {
         kind: 'polygon',
         points: [
@@ -124,10 +122,8 @@ describe('layoutTextInShape', () => {
       measurer: createFixedWidthTextMeasurer(),
     })
 
-    expect(layout.autoFillMode).toBe('dense')
-    expect(layout.lines[0]?.text).toBe('ONEONEONEO')
-    expect(layout.lines[0]?.width).toBe(100)
-    expect(layout.lines[0]?.text).not.toContain(' ')
+    expect(layout.lines.map(line => line.text)).toEqual(['A BA BA BA', ' BA BA BA ', 'BA BA BA B'])
+    expect(layout.lines.some(line => line.text.includes(' '))).toBe(true)
   })
 
   it('supports max fill by sweeping every slot in a band', () => {
@@ -135,7 +131,6 @@ describe('layoutTextInShape', () => {
       text: 'A B',
       font: '16px Test Sans',
       autoFill: true,
-      fillStrategy: 'max',
       compiledShape: {
         kind: 'polygon',
         source: {
@@ -173,8 +168,6 @@ describe('layoutTextInShape', () => {
       measurer: createFixedWidthTextMeasurer(),
     })
 
-    expect(layout.fillStrategy).toBe('max')
-    expect(layout.autoFillMode).toBe('stream')
     expect(layout.lines.map(line => [line.text, line.x, line.fillPass])).toEqual([
       ['A B', 0, 1],
       ['A B', 70, 1],
@@ -290,39 +283,15 @@ describe('layoutTextInShape', () => {
     })
 
     expect(layout.lines.map(line => line.text)).toEqual(['ABCD'])
-    expect(layout.fillStrategy).toBe('flow')
   })
 
-  it('strips whitespace and continues dense fill across line boundaries', () => {
-    const layout = layoutTextInShape({
-      text: 'A B',
-      font: '16px Test Sans',
-      lineHeight: 20,
-      autoFill: true,
-      autoFillMode: 'dense',
-      shape: {
-        kind: 'polygon',
-        points: [
-          { x: 0, y: 0 },
-          { x: 50, y: 0 },
-          { x: 50, y: 40 },
-          { x: 0, y: 40 },
-        ],
-      },
-      measurer: createFixedWidthTextMeasurer(),
-    })
-
-    expect(layout.lines.map(line => line.text)).toEqual(['ABABA', 'BABAB'])
-  })
-
-  it('rejects dense auto-fill when the source becomes whitespace-only', () => {
+  it('rejects empty max-fill input', () => {
     expect(() =>
       layoutTextInShape({
-        text: ' \n\t ',
+        text: '',
         font: '16px Test Sans',
         lineHeight: 20,
         autoFill: true,
-        autoFillMode: 'dense',
         shape: {
           kind: 'polygon',
           points: [
@@ -334,15 +303,14 @@ describe('layoutTextInShape', () => {
         },
         measurer: createFixedWidthTextMeasurer(),
       }),
-    ).toThrow('dense autoFill requires at least one non-whitespace grapheme')
+    ).toThrow('stream autoFill requires at least one grapheme')
   })
 
-  it('keeps empty word auto-fill exhausted state unchanged', () => {
+  it('keeps non-auto-fill empty text layout unchanged', () => {
     const layout = layoutTextInShape({
       text: '',
       font: '16px Test Sans',
       lineHeight: 20,
-      autoFill: true,
       shape: {
         kind: 'polygon',
         points: [
@@ -357,7 +325,6 @@ describe('layoutTextInShape', () => {
 
     expect(layout.lines).toHaveLength(0)
     expect(layout.exhausted).toBe(true)
-    expect(layout.autoFillMode).toBe('words')
   })
 
   it('normalizes textStyle into the resolved layout font and color', () => {
