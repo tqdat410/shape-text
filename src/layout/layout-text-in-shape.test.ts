@@ -181,6 +181,118 @@ describe('layoutTextInShape', () => {
     ])
   })
 
+  it('fills per-character text-mask regions sequentially while preserving region order', () => {
+    const layout = layoutTextInCompiledShape({
+      text: 'ABCD',
+      font: '16px Test Sans',
+      compiledShape: {
+        kind: 'text-mask',
+        source: {
+          kind: 'text-mask',
+          text: 'A B',
+          font: '700 160px Test Sans',
+          size: {
+            mode: 'fixed',
+            width: 80,
+            height: 20,
+          },
+          shapeTextMode: 'per-character',
+        },
+        bounds: { left: 0, top: 0, right: 80, bottom: 20 },
+        bandHeight: 20,
+        minSlotWidth: 1,
+        bands: [
+          {
+            top: 0,
+            bottom: 20,
+            intervals: [
+              { left: 0, right: 20 },
+              { left: 40, right: 60 },
+            ],
+          },
+        ],
+        regions: [
+          {
+            index: 0,
+            grapheme: 'A',
+            bounds: { left: 0, top: 0, right: 80, bottom: 20 },
+            bands: [{ top: 0, bottom: 20, intervals: [{ left: 0, right: 20 }] }],
+            debugView: {
+              kind: 'text',
+              text: 'A',
+              font: '700 160px Test Sans',
+              x: 0,
+              baseline: 16,
+            },
+          },
+          {
+            index: 1,
+            grapheme: 'B',
+            bounds: { left: 0, top: 0, right: 80, bottom: 20 },
+            bands: [{ top: 0, bottom: 20, intervals: [{ left: 40, right: 60 }] }],
+            debugView: {
+              kind: 'text',
+              text: 'B',
+              font: '700 160px Test Sans',
+              x: 40,
+              baseline: 16,
+            },
+          },
+        ],
+        debugView: {
+          kind: 'text',
+          text: 'A B',
+          font: '700 160px Test Sans',
+          x: 0,
+          baseline: 16,
+        },
+      },
+      measurer: createFixedWidthTextMeasurer(),
+    })
+
+    expect(layout.lines.map(line => [line.text, line.x])).toEqual([
+      ['AB', 0],
+      ['CD', 40],
+    ])
+  })
+
+  it('falls back to whole-shape flow when per-character regions are empty', () => {
+    const layout = layoutTextInCompiledShape({
+      text: 'ABCD',
+      font: '16px Test Sans',
+      compiledShape: {
+        kind: 'text-mask',
+        source: {
+          kind: 'text-mask',
+          text: 'III',
+          font: '700 160px Test Sans',
+          size: {
+            mode: 'fixed',
+            width: 60,
+            height: 20,
+          },
+          shapeTextMode: 'per-character',
+        },
+        bounds: { left: 0, top: 0, right: 60, bottom: 20 },
+        bandHeight: 20,
+        minSlotWidth: 50,
+        bands: [{ top: 0, bottom: 20, intervals: [{ left: 0, right: 60 }] }],
+        regions: [],
+        debugView: {
+          kind: 'text',
+          text: 'III',
+          font: '700 160px Test Sans',
+          x: 0,
+          baseline: 16,
+        },
+      },
+      measurer: createFixedWidthTextMeasurer(),
+    })
+
+    expect(layout.lines.map(line => line.text)).toEqual(['ABCD'])
+    expect(layout.fillStrategy).toBe('flow')
+  })
+
   it('strips whitespace and continues dense fill across line boundaries', () => {
     const layout = layoutTextInShape({
       text: 'A B',
