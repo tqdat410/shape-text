@@ -50,3 +50,4 @@
 - Added a Windows-safe manual `npm run publish:npm` path for first-time local publishes from `\\?\C:\...` terminals
 - Made the tag-driven release workflow idempotent so GitHub releases can still be created after a manual npm publish of the same version
 - Trimmed public GitHub-facing docs so the top-level surface stays focused on the library API and release flow instead of the internal demo app
+- Forced GitHub JavaScript actions onto Node 24 in CI/release workflows to avoid upcoming Node 20 runner deprecation noise
