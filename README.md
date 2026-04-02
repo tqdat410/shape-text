@@ -1,12 +1,12 @@
 # shape-text
 
-Browser-first TypeScript library for laying out text inside shapes and rendering the result to SVG.
+Browser-first TypeScript library for shape-paragraph layout and SVG rendering.
 
 ## V1 scope
 
 - SVG renderer
-- Polygon input
-- Text-mask input from glyph text
+- Geometry input
+- Value-derived input from text masks
 - Latin/Vietnamese first
 - Single closed shape, no holes
 - Shape-first API, not a thin wrapper over `pretext`
@@ -16,7 +16,36 @@ Browser-first TypeScript library for laying out text inside shapes and rendering
 
 ```bash
 npm install shape-text
+bun add shape-text
 ```
+
+## Local demo and browser E2E
+
+```bash
+npx playwright install chromium
+npm run demo
+npm run e2e:ui
+```
+
+- `npm run demo` starts the React workbench on `http://127.0.0.1:4173/`
+- `npm run demo:preview` serves the built demo
+- `npm run e2e` and `npm run e2e:ui` run Playwright against the built preview app on port `4174`, which is closer to production than hitting the dev server
+- The npm scripts resolve their own package root so they still work even if Windows launches `cmd.exe` with a broken fallback cwd
+
+## Ship readiness
+
+Library packaging is validated for both `npm` and `bun`.
+
+```bash
+npm run ship:check
+```
+
+That flow currently checks:
+
+- clean library build output
+- `npm pack` tarball contents
+- `bun pm pack` compatibility
+- smoke install + ESM import via both `npm` and `bun`
 
 ## Quick start
 
@@ -65,11 +94,20 @@ const svg = renderLayoutToSvg(layout, {
 })
 ```
 
-## Text-mask autofill
+## Shape sources
+
+`shape-text` currently ships two first-class ways to provide the shape paragraph surface:
+
+- Geometry input: pass explicit polygon points
+- Value-derived input: pass a `text-mask` shape derived from text and font
+
+The low-level API term stays `text-mask`, but the product framing is `value-derived shape`.
+
+## Value-derived example
 
 ```ts
 const layout = layoutTextInShape({
-  text: 'ONE',
+  text: 'Shape paragraph can fill a value-derived silhouette too.',
   textStyle: {
     family: 'Arial, sans-serif',
     size: 16,
@@ -78,10 +116,9 @@ const layout = layoutTextInShape({
   },
   lineHeight: 20,
   autoFill: true,
-  fillStrategy: 'max',
   shape: {
     kind: 'text-mask',
-    text: '2',
+    text: '23',
     font: '700 420px Arial',
     size: {
       mode: 'fit-content',
@@ -92,7 +129,7 @@ const layout = layoutTextInShape({
 })
 ```
 
-## Sequential text-mask regions
+## Sequential value-derived regions
 
 ```ts
 const layout = layoutTextInShape({
@@ -139,10 +176,10 @@ const layout = layoutTextInShape({
 
 - V1 keeps the text engine simple on purpose. It uses `Intl.Segmenter` for grapheme-safe word breaking, but it does not promise full browser-parity for every writing system.
 - The project takes inspiration from `pretext` for the `prepare -> layout` split and streaming line iteration, but owns its geometry, slot policy, and public API.
-- `text-mask` shapes are raster-compiled into reusable line bands. This is the default path for browser fonts such as `Arial`, and it is designed so callers can precompile `0-9` and `:` for clock-like UIs.
-- `autoFill: true` repeats the source text until the available shape bands are full.
-- `autoFillMode: 'words'` is the default readable repeat behavior. `autoFillMode: 'dense'` strips whitespace and breaks at grapheme boundaries to pack shapes harder for decorative fills.
-- `fillStrategy: 'max'` switches to an all-slots pass that fills every usable interval in reading order. It keeps spaces as normal graphemes instead of stripping them, and it does not fall back to smaller text for leftover pockets.
+- Geometry and value-derived shapes both compile into reusable line bands before layout.
+- `text-mask` shapes are raster-compiled into reusable line bands. This is the default value-derived path for browser fonts such as `Arial`, and it is designed so callers can precompile `0-9` and `:` for clock-like UIs.
+- `autoFill: true` now means one thing: max-fill stream layout that sweeps every usable interval in reading order.
+- Max fill keeps spaces as normal graphemes instead of stripping them, and it does not fall back to smaller text for leftover pockets.
 - `text-mask` sizing now lives under `shape.size`. The default `fit-content` mode measures the text mask first and grows the raster box to avoid clipping multi-character shapes such as `23`.
 - `shape.shapeTextMode: 'per-character'` keeps the full text-mask debug view, but also compiles ordered per-character regions for sequential fill across multi-character shape text.
 - `textStyle` is the new data-driven API for size, weight, italic/oblique, family, and default text color. Legacy `font` string input still works.
@@ -177,11 +214,17 @@ npm run e2e:headed
 npm run e2e:debug
 ```
 
-The E2E fixture is a static page served from `/e2e/fixtures/index.html`. It imports the built library from `/dist/index.js`, so the browser test path stays very close to real package usage.
+Playwright now targets the React workbench in `demo/`, so browser coverage runs against the same app used for manual exploration.
+
+## Publish notes
+
+- Published package surface is limited to `dist/`, `README.md`, and `LICENSE`
+- `npm pack` / `npm publish` trigger a clean library rebuild through `prepack`
+- Build output excludes test files so the tarball stays library-only
 
 ## Local Demo UI
 
-If you just want to open a real browser UI and click around:
+Open the React workbench:
 
 ```bash
 npm run demo
@@ -193,18 +236,24 @@ Then open:
 http://127.0.0.1:4173/
 ```
 
-For a fast local loop without rebuilding first:
+Build the workbench explicitly:
 
 ```bash
-npm run build
-npm run demo:dev
+npm run demo:build
 ```
 
-The demo now includes:
+Preview the built app:
 
-- direct `shape.text` editing for text-mask scenarios
+```bash
+npm run demo:preview
+```
+
+The workbench includes:
+
+- geometry vs value-derived shape source switching
+- direct `shape.text` editing for value-derived shapes
 - `shape.size.mode` switching between `fit-content` and `fixed`
-- `shapeTextMode` switching between `whole-text` and sequential `per-character` text-mask regions
+- `shapeTextMode` switching between `whole-text` and sequential `per-character` value-derived regions
+- random character-pattern fill presets
 - a payload JSON editor for the live `layout` + `render` request
 - a scrollable full-output SVG viewport with `Zoom out`, `Zoom in`, `100%`, and `Fit` controls
-- predefined random character-pattern fill presets for quick repeat-fill experiments
