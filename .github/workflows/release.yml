@@ -45,6 +45,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build library package
+        run: npm run build
+
       - name: Install example dependencies
         run: npm ci
         working-directory: examples/react-published-package-consumer
