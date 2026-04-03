@@ -39,7 +39,7 @@ export function PayloadEditorPanel(props: PayloadEditorPanelProps) {
     <details className="panel">
       <summary>Advanced payload editor</summary>
 
-      <p className="panel-copy">Edit the raw `layoutTextInShape()` and `renderLayoutToSvg()` request only when you need full control.</p>
+      <p className="panel-copy">Edit the raw request only when you want full control over `layoutTextInShape()` and `renderLayoutToSvg()`.</p>
 
       <label className="field">
         <span>Payload JSON</span>

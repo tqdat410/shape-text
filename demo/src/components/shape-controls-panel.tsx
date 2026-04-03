@@ -1,16 +1,23 @@
 import type { ShapeInput } from 'shape-text'
 
-import { geometryPresets, type GeometryPresetId } from '../demo-presets'
+import {
+  geometryPresets,
+  svgMaskPresets,
+  type GeometryPresetId,
+  type SvgMaskPresetId,
+} from '../demo-presets'
 import type { ShapeSource } from '../demo-model'
 
 type ShapeControlsPanelProps = {
   shapeSource: ShapeSource
   geometryPresetId: GeometryPresetId
+  svgMaskPresetId: SvgMaskPresetId
   shape: ShapeInput
   showShape: boolean
   shapeFill: string
   onShapeSourceChange: (value: ShapeSource) => void
   onGeometryPresetChange: (value: GeometryPresetId) => void
+  onSvgMaskPresetChange: (value: SvgMaskPresetId) => void
   onShapeTextChange: (value: string) => void
   onShapeTextModeChange: (value: 'whole-text' | 'per-character') => void
   onShapeSizeModeChange: (value: 'fit-content' | 'fixed') => void
@@ -21,13 +28,14 @@ type ShapeControlsPanelProps = {
 
 export function ShapeControlsPanel(props: ShapeControlsPanelProps) {
   const textMaskShape = props.shape.kind === 'text-mask' ? props.shape : null
+  const svgMaskShape = props.shape.kind === 'svg-mask' ? props.shape : null
   const fixedTextMaskSize = textMaskShape?.size?.mode === 'fixed' ? textMaskShape.size : null
 
   return (
     <section className="panel">
       <div className="panel-heading">
-        <h2>Shape Source</h2>
-        <p>Choose whether the paragraph flows through explicit geometry or a value-derived text mask.</p>
+        <h2>Shape</h2>
+        <p>Switch between polygon geometry, a text-derived mask, or an authored SVG silhouette.</p>
       </div>
 
       <div className="field-grid">
@@ -38,12 +46,13 @@ export function ShapeControlsPanel(props: ShapeControlsPanelProps) {
             value={props.shapeSource}
             onChange={event => props.onShapeSourceChange(event.target.value as ShapeSource)}
           >
-            <option value="value-derived">Value-derived input</option>
-            <option value="geometry">Geometry input</option>
+            <option value="value-derived">Text mask</option>
+            <option value="geometry">Polygon geometry</option>
+            <option value="svg-mask">SVG mask</option>
           </select>
         </label>
 
-        {textMaskShape === null ? (
+        {props.shapeSource === 'geometry' ? (
           <label className="field">
             <span>Geometry preset</span>
             <select
@@ -53,6 +62,24 @@ export function ShapeControlsPanel(props: ShapeControlsPanelProps) {
             >
               {props.geometryPresetId === 'custom' ? <option value="custom">Custom geometry</option> : null}
               {geometryPresets.map(preset => (
+                <option key={preset.id} value={preset.id}>
+                  {preset.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+
+        {svgMaskShape !== null ? (
+          <label className="field">
+            <span>SVG preset</span>
+            <select
+              aria-label="SVG preset"
+              value={props.svgMaskPresetId}
+              onChange={event => props.onSvgMaskPresetChange(event.target.value as SvgMaskPresetId)}
+            >
+              {props.svgMaskPresetId === 'custom' ? <option value="custom">Custom SVG mask</option> : null}
+              {svgMaskPresets.map(preset => (
                 <option key={preset.id} value={preset.id}>
                   {preset.label}
                 </option>
@@ -148,6 +175,13 @@ export function ShapeControlsPanel(props: ShapeControlsPanelProps) {
             </>
           ) : null}
         </div>
+      ) : null}
+
+      {svgMaskShape !== null ? (
+        <p className="panel-copy">
+          SVG mask mode keeps the live controls light. Switch presets here, then use the JSON editor below if you want
+          to edit the raw path, viewBox, or fixed-size box.
+        </p>
       ) : null}
     </section>
   )

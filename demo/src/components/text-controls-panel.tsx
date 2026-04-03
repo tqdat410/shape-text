@@ -24,8 +24,8 @@ export function TextControlsPanel(props: TextControlsPanelProps) {
   return (
     <section className="panel">
       <div className="panel-heading">
-        <h2>Paragraph</h2>
-        <p>Choose the paragraph, max-fill source text, and readable text styling.</p>
+        <h2>Content</h2>
+        <p>Change the source paragraph, switch fill presets, and tune the live text styling.</p>
       </div>
 
       <label className="field">

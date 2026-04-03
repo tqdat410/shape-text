@@ -16,8 +16,8 @@ export function RenderSummaryPanel(props: RenderSummaryPanelProps) {
   return (
     <section className="panel summary-panel">
       <div className="panel-heading">
-        <h2>Summary</h2>
-        <p>Visible app state only. Tests should read this, not private controller internals.</p>
+        <h2>Output</h2>
+        <p>The current layout result after the selected text, shape, and render settings are applied.</p>
       </div>
 
       <dl className="summary-grid">

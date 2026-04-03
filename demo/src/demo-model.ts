@@ -2,13 +2,19 @@ import type {
   PolygonShape,
   RenderLayoutToSvgOptions,
   ShapeInput,
+  SvgMaskShape,
   TextMaskShape,
   TextStyleInput,
 } from 'shape-text'
 
-import { createGeometryShapeFromPreset, defaultParagraphText, type GeometryPresetId } from './demo-presets'
+import {
+  createGeometryShapeFromPreset,
+  createSvgMaskShapeFromPreset,
+  defaultParagraphText,
+  type GeometryPresetId,
+} from './demo-presets'
 
-export type ShapeSource = 'geometry' | 'value-derived'
+export type ShapeSource = 'geometry' | 'value-derived' | 'svg-mask'
 
 export type DemoRequest = {
   layout: {
@@ -34,6 +40,10 @@ export function createDefaultTextMaskShape(): TextMaskShape {
     shapeTextMode: 'whole-text',
     maskScale: 2,
   }
+}
+
+export function createDefaultSvgMaskShape(): SvgMaskShape {
+  return createSvgMaskShapeFromPreset('speech-bubble')
 }
 
 export function createDefaultDemoRequest(): DemoRequest {
@@ -101,6 +111,14 @@ export function cloneShape(shape: ShapeInput): ShapeInput {
     }
   }
 
+  if (shape.kind === 'svg-mask') {
+    return {
+      ...shape,
+      size: shape.size === undefined ? undefined : { ...shape.size },
+      viewBox: { ...shape.viewBox },
+    }
+  }
+
   return {
     ...shape,
     size: shape.size === undefined ? undefined : { ...shape.size },
@@ -108,7 +126,11 @@ export function cloneShape(shape: ShapeInput): ShapeInput {
 }
 
 export function deriveShapeSource(shape: ShapeInput): ShapeSource {
-  return shape.kind === 'polygon' ? 'geometry' : 'value-derived'
+  if (shape.kind === 'polygon') {
+    return 'geometry'
+  }
+
+  return shape.kind === 'svg-mask' ? 'svg-mask' : 'value-derived'
 }
 
 export function createDefaultGeometryShape(geometryPresetId: GeometryPresetId): PolygonShape {

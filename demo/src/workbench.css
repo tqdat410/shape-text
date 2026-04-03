@@ -55,6 +55,14 @@ h2 {
   line-height: 1.6;
 }
 
+.hero-points {
+  margin: 14px 0 0;
+  padding-left: 18px;
+  color: #31465d;
+  display: grid;
+  gap: 6px;
+}
+
 .panel-heading {
   display: grid;
   gap: 6px;

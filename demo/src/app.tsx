@@ -10,6 +10,7 @@ export function App() {
   const workbench = useShapeParagraphWorkbench()
   const rendered = useRenderedDemoRequest(workbench.request)
   const isTextMask = workbench.request.layout.shape.kind === 'text-mask'
+  const isSvgMask = workbench.request.layout.shape.kind === 'svg-mask'
   const textWeight = String(workbench.request.layout.textStyle.weight ?? '700')
   const textItalic = (workbench.request.layout.textStyle.style ?? 'normal') !== 'normal'
   const textColor = workbench.request.layout.textStyle.color ?? '#0f172a'
@@ -18,11 +19,17 @@ export function App() {
   return (
     <main className="app-shell">
       <section className="hero panel">
-        <p className="eyebrow">shape paragraph</p>
-        <h1>Shape paragraph workbench</h1>
+        <p className="eyebrow">shape-text</p>
+        <h1>Shape text playground</h1>
         <p className="hero-copy">
-          One library, two shape sources: explicit geometry input or value-derived input. The demo is now the real browser workbench and the future E2E target.
+          Pick a paragraph, choose one of the three shape inputs, and watch the SVG update live. The same API can flow
+          readable copy, max-fill decorative text, or data-looking filler inside custom silhouettes.
         </p>
+        <ul className="hero-points">
+          <li>Use polygon geometry when you already have points.</li>
+          <li>Use text-mask when the shape should come from text like `23` or `SALE`.</li>
+          <li>Use svg-mask when you already have an authored silhouette path.</li>
+        </ul>
       </section>
 
       <section className="layout-grid">
@@ -50,11 +57,13 @@ export function App() {
           <ShapeControlsPanel
             shapeSource={workbench.shapeSource}
             geometryPresetId={workbench.geometryPresetId}
+            svgMaskPresetId={workbench.svgMaskPresetId}
             shape={workbench.request.layout.shape}
             showShape={workbench.request.render.showShape ?? true}
             shapeFill={shapeFill}
             onShapeSourceChange={workbench.setShapeSource}
             onGeometryPresetChange={workbench.setGeometryPreset}
+            onSvgMaskPresetChange={workbench.setSvgMaskPreset}
             onShapeTextChange={workbench.setShapeText}
             onShapeTextModeChange={workbench.setShapeTextMode}
             onShapeSizeModeChange={workbench.setShapeSizeMode}
@@ -76,11 +85,16 @@ export function App() {
 
           {isTextMask ? (
             <p className="mode-note">
-              Value-derived mode keeps `text-mask` as the low-level API term, but frames it in the UI as a shape source, not a one-off feature.
+              Text mask mode is the fastest way to turn numbers, words, and labels into shape-driven text art.
+            </p>
+          ) : isSvgMask ? (
+            <p className="mode-note">
+              SVG mask mode keeps path geometry in the shape layer, so the paragraph logic can stay identical while the
+              silhouette comes from authored vector art.
             </p>
           ) : (
             <p className="mode-note">
-              Geometry mode uses the same layout engine, only the compiled shape source changes.
+              Polygon mode uses the same layout engine. Only the source of the silhouette changes.
             </p>
           )}
         </div>

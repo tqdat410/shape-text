@@ -3,15 +3,17 @@ import {
   randomFillPresets,
   type PolygonShape,
   type RandomFillPresetId,
+  type SvgMaskShape,
 } from 'shape-text'
 
 export type GeometryPresetId = 'custom' | 'digit-two' | 'rectangle-wide'
+export type SvgMaskPresetId = 'custom' | 'speech-bubble' | 'drop'
 export type FillPresetId = 'custom' | RandomFillPresetId
 
 export const defaultParagraphText = [
-  'Shape paragraph lets a paragraph travel inside a silhouette instead of wrapping around a float.',
-  'Use geometry input when the shape already exists, or value-derived input when the shape should come from text like 23.',
-  'The same layout engine then turns that source into SVG lines or max-fill decorative coverage.',
+  'shape-text lays out a paragraph inside a custom silhouette, then renders the result as SVG.',
+  'Try polygon geometry when you already have points, text-mask when the shape should come from text, or svg-mask when you already have an authored path.',
+  'The same layout engine can stay readable like a paragraph or switch to max-fill coverage for decorative text art.',
 ].join(' ')
 
 function createDigitTwoPolygon(width: number, height: number) {
@@ -67,6 +69,35 @@ export const geometryPresets = [
   createShape: () => PolygonShape
 }>
 
+export const svgMaskPresets = [
+  {
+    id: 'speech-bubble',
+    label: 'Speech bubble',
+    createShape: (): SvgMaskShape => ({
+      kind: 'svg-mask',
+      path: 'M24 12 C14 12 6 20 6 30 V52 C6 64 15 72 27 72 H48 L64 88 L60 72 H114 C126 72 134 64 134 52 V30 C134 20 126 12 114 12 Z',
+      viewBox: { width: 140, height: 88 },
+      size: { mode: 'fit-content', padding: 6 },
+      maskScale: 2,
+    }),
+  },
+  {
+    id: 'drop',
+    label: 'Drop silhouette',
+    createShape: (): SvgMaskShape => ({
+      kind: 'svg-mask',
+      path: 'M70 6 C92 6 110 24 110 46 C110 75 86 98 70 122 C54 98 30 75 30 46 C30 24 48 6 70 6 Z',
+      viewBox: { width: 140, height: 128 },
+      size: { mode: 'fit-content', padding: 6 },
+      maskScale: 2,
+    }),
+  },
+] as const satisfies ReadonlyArray<{
+  id: Exclude<SvgMaskPresetId, 'custom'>
+  label: string
+  createShape: () => SvgMaskShape
+}>
+
 export const fillTextPresets = [
   { id: 'custom', label: 'Custom' },
   ...randomFillPresets,
@@ -76,6 +107,12 @@ function serializePoints(points: PolygonShape['points']) {
   return points.map(point => `${point.x},${point.y}`).join(';')
 }
 
+function serializeSvgMask(shape: SvgMaskShape) {
+  const viewBoxX = shape.viewBox.x ?? 0
+  const viewBoxY = shape.viewBox.y ?? 0
+  return `${shape.path}::${viewBoxX},${viewBoxY},${shape.viewBox.width},${shape.viewBox.height}`
+}
+
 export function createGeometryShapeFromPreset(id: GeometryPresetId): PolygonShape {
   return (geometryPresets.find(preset => preset.id === id) ?? geometryPresets[0]).createShape()
 }
@@ -83,6 +120,15 @@ export function createGeometryShapeFromPreset(id: GeometryPresetId): PolygonShap
 export function identifyGeometryPresetId(shape: PolygonShape): GeometryPresetId {
   const serializedPoints = serializePoints(shape.points)
   return geometryPresets.find(preset => serializePoints(preset.createShape().points) === serializedPoints)?.id ?? 'custom'
+}
+
+export function createSvgMaskShapeFromPreset(id: Exclude<SvgMaskPresetId, 'custom'>): SvgMaskShape {
+  return (svgMaskPresets.find(preset => preset.id === id) ?? svgMaskPresets[0]).createShape()
+}
+
+export function identifySvgMaskPresetId(shape: SvgMaskShape): SvgMaskPresetId {
+  const serializedShape = serializeSvgMask(shape)
+  return svgMaskPresets.find(preset => serializeSvgMask(preset.createShape()) === serializedShape)?.id ?? 'custom'
 }
 
 export function createFillTextPresetText(id: FillPresetId): string | null {
