@@ -35,7 +35,9 @@ export function useShapeParagraphWorkbench() {
       return
     }
 
-    textMaskShapeRef.current = nextRequest.layout.shape
+    if (nextRequest.layout.shape.kind === 'text-mask') {
+      textMaskShapeRef.current = nextRequest.layout.shape
+    }
   }
 
   function applyRequest(nextRequest: DemoRequest) {

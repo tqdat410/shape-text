@@ -17,9 +17,11 @@
 - Harden npm/bun release readiness for shipping the library as a clean consumable package
 - Add GitHub Actions CI and tag-driven npm release automation with Bun compatibility checks
 - Completed on 2026-04-03:
+  - Replace the published package consumer gallery with a focused ICT clock example screen built from the shipped library APIs
   - Close the audit-fix pass for cache safety, polygon/input validation, repeat-layout guards, renderer blur limits, and the published consumer example toolchain floor
+  - Add `svg-mask` as a third shape source and validate it with a reaching-hand silhouette example below the published-consumer clock
 - Remaining:
-  - Add alpha-mask adapter
+  - Expand alpha-mask adapters beyond path silhouettes if product demand appears
 
 ## Phase 3
 

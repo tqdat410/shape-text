@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { compileShapeForLayout } from '../shape/compile-shape-for-layout.js'
 import { layoutTextInCompiledShape } from './layout-text-in-compiled-shape.js'
@@ -12,6 +12,10 @@ function createFixedWidthTextMeasurer(unit = 10): TextMeasurer {
     },
   }
 }
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
 
 describe('layoutTextInShape', () => {
   it('lays out words into a rectangle', () => {
@@ -392,5 +396,58 @@ describe('layoutTextInShape', () => {
 
     expect(layout.font).toBe('italic 700 18px Test Sans')
     expect(layout.textStyle?.color).toBe('#2563eb')
+  })
+
+  it('accepts svg-mask shapes through the high-level layout entrypoint', () => {
+    class FakePath2D {
+      bounds = { left: 0, right: 80 }
+
+      constructor(_path: string) {}
+    }
+
+    class FakeCanvasContext {
+      clearRect(): void {}
+
+      fill(_path: FakePath2D): void {}
+
+      getImageData(): ImageData {
+        const data = new Uint8ClampedArray(80 * 40 * 4)
+
+        for (let index = 3; index < data.length; index += 4) {
+          data[index] = 255
+        }
+
+        return { data } as ImageData
+      }
+
+      setTransform(): void {}
+    }
+
+    class FakeOffscreenCanvas {
+      getContext(kind: string): FakeCanvasContext | null {
+        return kind === '2d' ? new FakeCanvasContext() : null
+      }
+    }
+
+    vi.stubGlobal('OffscreenCanvas', FakeOffscreenCanvas)
+    vi.stubGlobal('Path2D', FakePath2D)
+
+    const layout = layoutTextInShape({
+      text: 'mot hai ba bon',
+      font: '16px Test Sans',
+      lineHeight: 20,
+      shape: {
+        kind: 'svg-mask',
+        path: 'M 0 0 L 80 0 L 80 40 L 0 40 Z',
+        viewBox: {
+          width: 80,
+          height: 40,
+        },
+        maskScale: 1,
+      },
+      measurer: createFixedWidthTextMeasurer(),
+    })
+
+    expect(layout.lines.map(line => line.text)).toEqual(['mot hai', 'ba bon'])
   })
 })

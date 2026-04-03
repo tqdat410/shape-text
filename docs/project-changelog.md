@@ -1,5 +1,9 @@
 # Project Changelog
 
+## 2026-04-03
+
+- Added a GitHub Pages deployment workflow for `examples/react-published-package-consumer` and made its Vite `base` configurable through `VITE_BASE_PATH` so the built demo can ship from a repo-scoped Pages URL without broken asset paths.
+
 ## 2026-03-30
 
 - Bootstrapped repository
@@ -57,6 +61,15 @@
 
 ## 2026-04-03
 
+- Replaced the published package consumer gallery with a minimal fullscreen ICT `HH:mm:SS` clock example screen driven by the published package APIs
+- Added published-consumer helper modules for ICT time formatting, second-aligned refresh scheduling, per-glyph clock SVG creation, and mixed preset-family fill generation
+- Switched the clock example fill to white non-bold max-fill text and render each visible clock glyph separately so preset families can vary per glyph
+- Added `svg-mask` as a third public shape source using local SVG path silhouettes plus viewBox raster compilation
+- Added a reaching-hand SVG-mask example section below the published-consumer clock using a local reaching-hand silhouette path
+- Switched the published-consumer app from source aliasing to a local package dependency so repo validation stays on the packaged API surface
+- Added a checked-in Playwright smoke test for the published-consumer app and made browser e2e boot fresh preview servers instead of reusing stale local ports
+- Retuned the published-consumer art direction from pure black/white to a warm editorial palette, softened the clock fill, and enlarged the hand so it rises from the bottom edge with warm skin-tone text
+- Added cheap Vitest coverage for the published consumer example's pure helpers and widened the root Vitest exclude rule so `examples/**` logic tests can run in the normal project check
 - Added a size-capped text-mask compiled-shape cache with LRU-style promotion and exported `clearTextMaskShapeCache` from the public API
 - Rejected non-finite polygon point coordinates in both polygon compilation and direct polygon band helper calls
 - Guarded repeated-text line layout against non-advancing empty-word tokens

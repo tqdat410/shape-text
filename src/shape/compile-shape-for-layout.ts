@@ -1,5 +1,6 @@
 import type { CompiledShapeBands, CompileShapeForLayoutOptions } from '../types.js'
 import { compilePolygonShapeForLayout } from './compile-polygon-shape-for-layout.js'
+import { compileSvgMaskShapeForLayout } from './compile-svg-mask-shape-for-layout.js'
 import { compileTextMaskShapeForLayout } from './compile-text-mask-shape-for-layout.js'
 
 export function compileShapeForLayout(
@@ -17,6 +18,9 @@ export function compileShapeForLayout(
   switch (options.shape.kind) {
     case 'polygon':
       return compilePolygonShapeForLayout(options.shape, options.lineHeight, minSlotWidth)
+
+    case 'svg-mask':
+      return compileSvgMaskShapeForLayout(options.shape, options.lineHeight, minSlotWidth)
 
     case 'text-mask':
       return compileTextMaskShapeForLayout(options.shape, options.lineHeight, minSlotWidth)

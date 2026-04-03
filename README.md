@@ -21,7 +21,7 @@ bun add shape-text
 
 ## Published consumer example
 
-A small React consumer app lives at [examples/react-published-package-consumer](./examples/react-published-package-consumer/). Inside this repo it resolves `shape-text` to the current package surface so it can validate unreleased API additions before the next publish.
+A small React consumer app lives at [examples/react-published-package-consumer](./examples/react-published-package-consumer/). It now renders a minimal ICT `HH:mm:SS` clock screen plus a reaching-hand SVG-mask fill example below it, all driven by the package exports. Inside this repo it installs `shape-text` through a local file dependency instead of aliasing source files, so the app validates the real packaged surface of the current tree.
 
 ## Ship readiness
 
@@ -93,12 +93,42 @@ const svg = renderLayoutToSvg(layout, {
 
 ## Shape sources
 
-`shape-text` currently ships two first-class ways to provide the shape paragraph surface:
+`shape-text` currently ships three first-class ways to provide the shape paragraph surface:
 
 - Geometry input: pass explicit polygon points
 - Value-derived input: pass a `text-mask` shape derived from text and font
+- SVG mask input: pass a silhouette path and viewBox through `svg-mask`
 
 The low-level API term stays `text-mask`, but the product framing is `value-derived shape`.
+
+## SVG mask example
+
+```ts
+const layout = layoutTextInShape({
+  text: 'Shape paragraph can also fill an authored SVG silhouette.',
+  textStyle: {
+    family: '"Ubuntu", sans-serif',
+    size: 12,
+    weight: 400,
+    color: '#ffffff',
+  },
+  lineHeight: 14,
+  autoFill: true,
+  shape: {
+    kind: 'svg-mask',
+    path: 'M 0 0 L 160 0 L 160 40 L 0 40 Z',
+    viewBox: {
+      width: 160,
+      height: 40,
+    },
+    size: {
+      mode: 'fit-content',
+      padding: 4,
+    },
+  },
+  measurer,
+})
+```
 
 ## Value-derived example
 
@@ -184,6 +214,7 @@ const customFillText = createRandomFillText({
 - `createCanvasTextMeasurer()`
 - `createRandomFillText()`
 - `compileShapeForLayout()`
+- `clearTextMaskShapeCache()`
 - `getRandomFillPreset()`
 - `normalizeTextStyleToFont()`
 - `prepareTextForLayout()`
@@ -201,6 +232,7 @@ const customFillText = createRandomFillText({
 - The project takes inspiration from `pretext` for the `prepare -> layout` split and streaming line iteration, but owns its geometry, slot policy, and public API.
 - Geometry and value-derived shapes both compile into reusable line bands before layout.
 - `text-mask` shapes are raster-compiled into reusable line bands. This is the default value-derived path for browser fonts such as `Arial`, and it is designed so callers can precompile `0-9` and `:` for clock-like UIs.
+- `svg-mask` shapes are raster-compiled from a local SVG path silhouette plus viewBox. V1 intentionally accepts path geometry, not arbitrary raw SVG markup or remote assets.
 - `autoFill: true` now means one thing: max-fill stream layout that sweeps every usable interval in reading order.
 - Max fill keeps spaces as normal graphemes instead of stripping them, and it does not fall back to smaller text for leftover pockets.
 - Random fill helpers are content utilities only; they generate source text but do not change layout rules.

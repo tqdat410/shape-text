@@ -30,6 +30,36 @@ export type PolygonShape = {
   points: ShapeTextPoint[]
 }
 
+export type SvgMaskShapeFitContentSize = {
+  mode?: 'fit-content'
+  padding?: number
+}
+
+export type SvgMaskShapeFixedSize = {
+  mode: 'fixed'
+  width: number
+  height: number
+  padding?: number
+}
+
+export type SvgMaskShapeSize = SvgMaskShapeFitContentSize | SvgMaskShapeFixedSize
+
+export type SvgMaskShapeViewBox = {
+  x?: number
+  y?: number
+  width: number
+  height: number
+}
+
+export type SvgMaskShape = {
+  kind: 'svg-mask'
+  path: string
+  viewBox: SvgMaskShapeViewBox
+  size?: SvgMaskShapeSize
+  maskScale?: number
+  alphaThreshold?: number
+}
+
 export type TextMaskShape = {
   kind: 'text-mask'
   text: string
@@ -40,7 +70,7 @@ export type TextMaskShape = {
   alphaThreshold?: number
 }
 
-export type ShapeInput = PolygonShape | TextMaskShape
+export type ShapeInput = PolygonShape | SvgMaskShape | TextMaskShape
 
 export type TextMeasurer = {
   measureText(text: string, font: string): number
@@ -143,6 +173,14 @@ export type CompiledShapeDebugView =
   | {
       kind: 'polygon'
       points: ShapeTextPoint[]
+    }
+  | {
+      kind: 'path'
+      path: string
+      x: number
+      y: number
+      scaleX: number
+      scaleY: number
     }
   | {
       kind: 'text'

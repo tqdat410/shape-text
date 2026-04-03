@@ -210,6 +210,51 @@ describe('renderLayoutToSvg', () => {
     expect(svg).toContain('fill="#fef3c7"')
   })
 
+  it('renders svg-mask debug views as SVG paths when showShape is enabled', () => {
+    const svg = renderLayoutToSvg({
+      font: '16px Test Sans',
+      lineHeight: 20,
+      shape: {
+        kind: 'svg-mask',
+        path: 'M 0 0 L 80 0 L 80 40 L 0 40 Z',
+        viewBox: {
+          width: 80,
+          height: 40,
+        },
+      },
+      compiledShape: {
+        kind: 'svg-mask',
+        source: {
+          kind: 'svg-mask',
+          path: 'M 0 0 L 80 0 L 80 40 L 0 40 Z',
+          viewBox: {
+            width: 80,
+            height: 40,
+          },
+        },
+        bounds: { left: 0, top: 0, right: 80, bottom: 40 },
+        bandHeight: 20,
+        minSlotWidth: 16,
+        bands: [],
+        debugView: {
+          kind: 'path',
+          path: 'M 0 0 L 80 0 L 80 40 L 0 40 Z',
+          x: 0,
+          y: 0,
+          scaleX: 1,
+          scaleY: 1,
+        },
+      },
+      bounds: { left: 0, top: 0, right: 80, bottom: 40 },
+      lines: [],
+      exhausted: true,
+      autoFill: false,
+    } satisfies ShapeTextLayout, { showShape: true })
+
+    expect(svg).toContain('<path d="M 0 0 L 80 0 L 80 40 L 0 40 Z"')
+    expect(svg).toContain('transform="translate(0 0) scale(1 1)"')
+  })
+
   it('expands the viewport for borders and shadows without manual padding', () => {
     const layout = layoutTextInShape({
       text: 'shadow',

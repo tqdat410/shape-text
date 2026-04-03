@@ -4,17 +4,18 @@
 
 - `text/*`: text preparation and streamed line breaking
 - `geometry/*`: polygon band sampling, interval extraction, and shared scanline interval helpers
-- `shape/*`: shape compilation, text-mask size resolution, cacheable band generation, optional per-character text-mask region extraction, and capped text-mask cache lifecycle
+- `shape/*`: shape compilation, text-mask and svg-mask size resolution, cacheable alpha-mask band generation, optional per-character text-mask region extraction, and capped text-mask cache lifecycle
 - `layout/*`: shape-aware line placement, max-fill repeat coverage, and sequential region flow for per-character text masks
 - `render/*`: SVG serialization
 - `demo/*`: internal maintainer workbench and browser verification app
-- `e2e/*`: Playwright browser coverage against the internal verification app
+- `examples/react-published-package-consumer/*`: published-consumer verification app, currently a focused ICT `HH:mm:SS` clock screen plus a reaching-hand `svg-mask` silhouette demo through the packaged library surface
+- `e2e/*`: Playwright browser coverage against both the internal verification app and the published-consumer app
 - `.github/workflows/*`: CI enforcement and tag-driven npm release automation
 
 ## Data Flow
 
 1. Normalize text formatting into a canonical font string
-2. Validate shape inputs, resolve text-mask sizing into either `fit-content` or fixed bounds, then compile the input shape into reusable line bands
+2. Validate shape inputs, resolve text-mask or svg-mask sizing into either `fit-content` or fixed bounds, then compile the input shape into reusable line bands
 3. For `text-mask` shapes with `shapeTextMode: 'per-character'`, also compile ordered non-space grapheme regions from the same mask source
 4. Compute allowed intervals for each band or per-character region
 5. Route layout through sequential regions when they exist; otherwise use the normal whole-shape flow or the max-fill path
@@ -27,7 +28,7 @@
 
 - Text measurement stays replaceable through the layout measurer interface
 - Layout-affecting text style stays in the layout API
-- Shape compilation stays separate from content flow so resolved text-mask bounds, glyph shapes, per-character regions, and bounded text-mask cache entries can be reused
+- Shape compilation stays separate from content flow so resolved text-mask/svg-mask bounds, glyph shapes, silhouette masks, per-character regions, and bounded cache entries can be reused
 - Geometry stays shape-specific, not DOM-specific
 - Renderer-only decoration stays out of compile/layout caching
 - Renderer consumes compiled layout output only

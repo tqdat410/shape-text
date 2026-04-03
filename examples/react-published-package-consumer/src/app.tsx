@@ -1,91 +1,143 @@
-import { useState } from 'react'
-import {
-  createPresetFillText,
-  defaultCustomFillText,
-  fillPresets,
-  type FillPresetId,
-} from './fill-random-presets'
-import { renderExampleSvgCards } from './render-example-svg-cards'
+import { startTransition, useEffect, useEffectEvent, useState } from 'react'
+import { createClockFillText, resolveClockGlyphFills } from './create-clock-fill-text'
+import { createIctClockSvg } from './create-ict-clock-svg'
+import { createReachingHandFillText } from './create-reaching-hand-fill-text'
+import { createReachingHandSvg } from './create-reaching-hand-svg'
+import { formatIctClockDisplay } from './format-ict-clock-display'
+import { getMillisecondsUntilNextSecond } from './get-milliseconds-until-next-second'
 import './app.css'
 
+type ClockScreenState = {
+  clockValue: string
+  glyphFills: string[]
+}
+
+const clockFont = '700 340px Ubuntu'
+const clockFontSample = '00:00:00'
+
+function createInitialClockScreenState(): ClockScreenState {
+  const clockValue = formatIctClockDisplay()
+
+  return {
+    clockValue,
+    glyphFills: Array.from(clockValue, () => createClockFillText({})),
+  }
+}
+
+function isClockFontReady(): boolean {
+  if (typeof document === 'undefined' || document.fonts === undefined) {
+    return true
+  }
+
+  try {
+    return document.fonts.check(clockFont, clockFontSample)
+  } catch {
+    return true
+  }
+}
+
 export function App() {
-  const [fillPresetId, setFillPresetId] = useState<FillPresetId>('ascii')
-  const [fillText, setFillText] = useState(() => createPresetFillText('ascii'))
-  const cards = renderExampleSvgCards({ fillText })
+  const [clockScreen, setClockScreen] = useState(createInitialClockScreenState)
+  const [handFillText] = useState(createReachingHandFillText)
+  const [fontReady, setFontReady] = useState(() => isClockFontReady())
 
-  function handlePresetChange(nextPresetId: FillPresetId) {
-    setFillPresetId(nextPresetId)
-    setFillText(createPresetFillText(nextPresetId))
-  }
+  const refreshClock = useEffectEvent(() => {
+    const nextClockValue = formatIctClockDisplay()
 
-  function handleReroll() {
-    setFillText(createPresetFillText(fillPresetId))
-  }
+    startTransition(() => {
+      setClockScreen(current =>
+        current.clockValue === nextClockValue
+          ? current
+          : {
+              clockValue: nextClockValue,
+              glyphFills: resolveClockGlyphFills(
+                current.clockValue,
+                nextClockValue,
+                current.glyphFills,
+              ),
+            },
+      )
+    })
+  })
+
+  useEffect(() => {
+    let timeoutId = 0
+
+    const scheduleRefresh = () => {
+      refreshClock()
+
+      timeoutId = window.setTimeout(() => {
+        scheduleRefresh()
+      }, getMillisecondsUntilNextSecond())
+    }
+
+    scheduleRefresh()
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (fontReady || typeof document === 'undefined' || document.fonts === undefined) {
+      return
+    }
+
+    let cancelled = false
+
+    async function loadClockFont() {
+      try {
+        await Promise.all([
+          document.fonts.load(clockFont, clockFontSample),
+          document.fonts.ready,
+        ])
+      } finally {
+        if (!cancelled) {
+          setFontReady(isClockFontReady())
+        }
+      }
+    }
+
+    void loadClockFont()
+
+    return () => {
+      cancelled = true
+    }
+  }, [fontReady])
 
   return (
-    <main className="page-shell">
-      <section className="hero-panel">
-        <p className="eyebrow">Published package consumer</p>
-        <h1>React app using shape-text from npm or bun</h1>
-        <p className="hero-copy">
-          This app imports <code>shape-text</code> through the package name and
-          tracks the current package surface inside this repo.
-        </p>
-        <div className="command-row">
-          <code>npm install</code>
-          <code>npm run dev</code>
+    <main className="showcase-screen">
+      <section className="clock-stage">
+        <div
+          aria-label={`ICT time ${clockScreen.clockValue}`}
+          aria-live="polite"
+          className="clock-face"
+        >
+          {Array.from(clockScreen.clockValue).map((glyph, index) => (
+            <div
+              className="clock-glyph"
+              dangerouslySetInnerHTML={{
+                __html: createIctClockSvg({
+                  clockValue: glyph,
+                  fillText: clockScreen.glyphFills[index]!,
+                }),
+              }}
+              key={`${index}-${glyph}`}
+            />
+          ))}
         </div>
-        <div className="command-row">
-          <code>bun install</code>
-          <code>bun run dev</code>
-        </div>
-        <div className="controls-row">
-          <label className="field">
-            <span>Random content</span>
-            <select
-              value={fillPresetId}
-              onChange={event =>
-                handlePresetChange(event.target.value as FillPresetId)
-              }
-            >
-              {fillPresets.map(preset => (
-                <option key={preset.id} value={preset.id}>
-                  {preset.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button className="reroll-button" onClick={handleReroll} type="button">
-            Reroll
-          </button>
-        </div>
-        <label className="field field-textarea">
-          <span>Fill text</span>
-          <textarea
-            rows={4}
-            value={fillText}
-            onChange={event => {
-              setFillPresetId('custom')
-              setFillText(event.target.value || defaultCustomFillText)
-            }}
-          />
-        </label>
       </section>
 
-      <section className="card-grid">
-        {cards.map(card => (
-          <article className="example-card" key={card.title}>
-            <div>
-              <h2>{card.title}</h2>
-              <p>{card.description}</p>
-            </div>
-            <div
-              aria-label={card.title}
-              className="svg-frame"
-              dangerouslySetInnerHTML={{ __html: card.svg }}
-            />
-          </article>
-        ))}
+      <section className="hand-stage">
+        <div
+          aria-label="Reaching hand SVG mask example"
+          className="hand-art"
+          dangerouslySetInnerHTML={{
+            __html: createReachingHandSvg({
+              fillText: handFillText,
+            }),
+          }}
+        />
       </section>
     </main>
   )

@@ -14,7 +14,7 @@
   "dependencies": {
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "shape-text": "^0.2.0"
+    "shape-text": "file:../.."
   },
   "devDependencies": {
     "@types/react": "^19.2.14",

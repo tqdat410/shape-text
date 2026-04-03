@@ -56,6 +56,10 @@ function renderShapeAttributes(
     return `<polygon points="${renderPoints(debugView.points)}" fill="${fill}" stroke="${stroke}" stroke-width="${options.strokeWidth}"${filter} />`
   }
 
+  if (debugView.kind === 'path') {
+    return `<path d="${escapeXmlText(debugView.path)}" transform="translate(${debugView.x} ${debugView.y}) scale(${debugView.scaleX} ${debugView.scaleY})" fill="${fill}" stroke="${stroke}" stroke-width="${options.strokeWidth}"${filter} />`
+  }
+
   return `<text x="${debugView.x}" y="${debugView.baseline}" fill="${fill}" stroke="${stroke}" stroke-width="${options.strokeWidth}"${filter} style="font:${escapeXmlText(debugView.font)};">${escapeXmlText(debugView.text)}</text>`
 }
 
