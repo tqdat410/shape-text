@@ -16,6 +16,9 @@ function normalizeShadow(shadow: ShapeShadowInput | undefined): ResolvedShapeSty
   }
 
   assertFiniteNonNegative(shadow.blur, 'shapeStyle.shadow.blur must be a finite non-negative number')
+  if (shadow.blur > 500) {
+    throw new Error('shapeStyle.shadow.blur must not exceed 500')
+  }
 
   const offsetX = shadow.offsetX ?? 0
   const offsetY = shadow.offsetY ?? 0

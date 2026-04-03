@@ -15,7 +15,21 @@ import {
 import { segmentTextMaskGraphemes } from './segment-text-mask-graphemes.js'
 
 const MAX_MASK_PIXELS = 4_000_000
+const MAX_CACHE_SIZE = 64
 const compiledShapeCache = new Map<string, CompiledShapeBands>()
+
+function cacheSet(key: string, value: CompiledShapeBands): void {
+  if (compiledShapeCache.has(key)) {
+    compiledShapeCache.delete(key)
+  } else if (compiledShapeCache.size >= MAX_CACHE_SIZE) {
+    const oldestKey = compiledShapeCache.keys().next().value
+    if (oldestKey !== undefined) {
+      compiledShapeCache.delete(oldestKey)
+    }
+  }
+
+  compiledShapeCache.set(key, value)
+}
 
 function validateTextMaskShape(shape: TextMaskShape, size: ResolvedTextMaskSize): void {
   if (shape.text.length === 0) {
@@ -195,6 +209,8 @@ export function compileTextMaskShapeForLayout(
   const cacheKey = buildCacheKey(shape, size, lineHeight, minSlotWidth)
   const cachedShape = fontReadyForCache ? compiledShapeCache.get(cacheKey) : undefined
   if (cachedShape !== undefined) {
+    compiledShapeCache.delete(cacheKey)
+    compiledShapeCache.set(cacheKey, cachedShape)
     return cachedShape
   }
 
@@ -233,8 +249,12 @@ export function compileTextMaskShapeForLayout(
 
   const frozenShape = freezeCompiledShape(compiledShape)
   if (fontReadyForCache) {
-    compiledShapeCache.set(cacheKey, frozenShape)
+    cacheSet(cacheKey, frozenShape)
   }
 
   return frozenShape
+}
+
+export function clearTextMaskShapeCache(): void {
+  compiledShapeCache.clear()
 }

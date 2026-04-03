@@ -12,9 +12,21 @@ export function layoutNextLineFromRepeatedText(
   let width = 0
   let tokenIndex = start.tokenIndex
   let graphemeIndex = start.graphemeIndex
+  let consecutiveEmptyWordCount = 0
 
   while (true) {
     const token = prepared.tokens[tokenIndex % prepared.tokens.length]!
+
+    if (token.kind === 'word' && token.graphemes.length === 0) {
+      tokenIndex += 1
+      consecutiveEmptyWordCount += 1
+      if (consecutiveEmptyWordCount >= prepared.tokens.length) {
+        return null
+      }
+      continue
+    }
+
+    consecutiveEmptyWordCount = 0
 
     if (token.kind === 'newline') {
       return {

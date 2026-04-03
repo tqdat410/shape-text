@@ -1,5 +1,7 @@
 import type { Interval, ShapeTextPoint } from '../types.js'
+import { assertFiniteShapeTextPoints } from './assert-finite-shape-text-points.js'
 import { getXIntersectionsAtY } from './get-x-intersections-at-y.js'
+import { intersectIntervalSets } from './intersect-interval-sets.js'
 
 function pairIntersections(xs: number[]): Interval[] {
   const intervals: Interval[] = []
@@ -11,37 +13,14 @@ function pairIntersections(xs: number[]): Interval[] {
   return intervals
 }
 
-function intersectIntervalSets(leftSet: Interval[], rightSet: Interval[]): Interval[] {
-  const intersections: Interval[] = []
-  let leftIndex = 0
-  let rightIndex = 0
-
-  while (leftIndex < leftSet.length && rightIndex < rightSet.length) {
-    const left = leftSet[leftIndex]!
-    const right = rightSet[rightIndex]!
-    const overlapLeft = Math.max(left.left, right.left)
-    const overlapRight = Math.min(left.right, right.right)
-
-    if (overlapRight > overlapLeft) {
-      intersections.push({ left: overlapLeft, right: overlapRight })
-    }
-
-    if (left.right < right.right) {
-      leftIndex += 1
-    } else {
-      rightIndex += 1
-    }
-  }
-
-  return intersections
-}
-
 export function getBandIntervalsFromPolygon(
   points: ShapeTextPoint[],
   bandTop: number,
   bandBottom: number,
   minSlotWidth = 0,
 ): Interval[] {
+  assertFiniteShapeTextPoints(points)
+
   const startRow = Math.floor(bandTop)
   const endRow = Math.max(startRow, Math.ceil(bandBottom) - 1)
   let intervals: Interval[] | null = null
@@ -55,4 +34,3 @@ export function getBandIntervalsFromPolygon(
 
   return (intervals ?? []).filter(interval => interval.right - interval.left >= minSlotWidth)
 }
-

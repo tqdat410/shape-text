@@ -1,4 +1,5 @@
 import type { CompiledShapeBands, PolygonShape } from '../types.js'
+import { assertFiniteShapeTextPoints } from '../geometry/assert-finite-shape-text-points.js'
 import { getBandIntervalsFromPolygon } from '../geometry/get-band-intervals-from-polygon.js'
 import { getPolygonBounds } from '../geometry/get-polygon-bounds.js'
 
@@ -7,6 +8,7 @@ export function compilePolygonShapeForLayout(
   lineHeight: number,
   minSlotWidth: number,
 ): CompiledShapeBands {
+  assertFiniteShapeTextPoints(shape.points)
   const bounds = getPolygonBounds(shape.points)
   const bands = []
 

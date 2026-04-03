@@ -306,6 +306,46 @@ describe('layoutTextInShape', () => {
     ).toThrow('stream autoFill requires at least one grapheme')
   })
 
+  it('rejects polygon points with NaN coordinates', () => {
+    expect(() =>
+      layoutTextInShape({
+        text: 'abc',
+        font: '16px Test Sans',
+        lineHeight: 20,
+        shape: {
+          kind: 'polygon',
+          points: [
+            { x: Number.NaN, y: 0 },
+            { x: 100, y: 0 },
+            { x: 100, y: 60 },
+            { x: 0, y: 60 },
+          ],
+        },
+        measurer: createFixedWidthTextMeasurer(),
+      }),
+    ).toThrow('polygon point coordinates must be finite numbers')
+  })
+
+  it('rejects polygon points with infinite coordinates', () => {
+    expect(() =>
+      layoutTextInShape({
+        text: 'abc',
+        font: '16px Test Sans',
+        lineHeight: 20,
+        shape: {
+          kind: 'polygon',
+          points: [
+            { x: 0, y: 0 },
+            { x: Number.POSITIVE_INFINITY, y: 0 },
+            { x: 100, y: 60 },
+            { x: 0, y: 60 },
+          ],
+        },
+        measurer: createFixedWidthTextMeasurer(),
+      }),
+    ).toThrow('polygon point coordinates must be finite numbers')
+  })
+
   it('keeps non-auto-fill empty text layout unchanged', () => {
     const layout = layoutTextInShape({
       text: '',

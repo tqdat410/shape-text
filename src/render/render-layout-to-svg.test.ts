@@ -243,6 +243,34 @@ describe('renderLayoutToSvg', () => {
     expect(svg).toContain('viewBox="-34 -34 274 112"')
   })
 
+  it('rejects shadows with blur above the supported cap', () => {
+    const layout = layoutTextInShape({
+      text: 'shadow',
+      font: '16px Test Sans',
+      lineHeight: 20,
+      shape: {
+        kind: 'polygon',
+        points: [
+          { x: 0, y: 0 },
+          { x: 200, y: 0 },
+          { x: 200, y: 40 },
+          { x: 0, y: 40 },
+        ],
+      },
+      measurer,
+    })
+
+    expect(() =>
+      renderLayoutToSvg(layout, {
+        shapeStyle: {
+          shadow: {
+            blur: 501,
+          },
+        },
+      }),
+    ).toThrow('shapeStyle.shadow.blur must not exceed 500')
+  })
+
   it('renders a legacy layout object without textStyle metadata', () => {
     const svg = renderLayoutToSvg({
       font: '16px Test Sans',
