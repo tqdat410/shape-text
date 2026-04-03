@@ -2,6 +2,7 @@
 
 ## 2026-04-03
 
+- Reworked the public README and browser playground around user-facing onboarding, removed maintainer-heavy package notes from the package README, and exposed `svg-mask` as a first-class selectable source in the live demo
 - Added a GitHub Pages deployment workflow for `examples/react-published-package-consumer` and made its Vite `base` configurable through `VITE_BASE_PATH` so the built demo can ship from a repo-scoped Pages URL without broken asset paths.
 
 ## 2026-03-30
