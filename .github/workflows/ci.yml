@@ -68,6 +68,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install example dependencies
+        run: npm ci
+        working-directory: examples/react-published-package-consumer
+
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 

@@ -45,6 +45,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install example dependencies
+        run: npm ci
+        working-directory: examples/react-published-package-consumer
+
       - name: Validate release tag against package version
         run: node ./scripts/validate-release-tag.mjs "${{ github.ref_name }}"
 
