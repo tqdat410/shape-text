@@ -54,3 +54,12 @@
 - Added `examples/react-published-package-consumer/`, a small React app that imports `shape-text` from the published registry path and builds under both npm and bun
 - Promoted random fill content generation into the published library surface via reusable preset metadata and `createRandomFillText(...)`
 - Migrated demo random fill generation to consume the library API instead of keeping its own alphabet logic
+
+## 2026-04-03
+
+- Added a size-capped text-mask compiled-shape cache with LRU-style promotion and exported `clearTextMaskShapeCache` from the public API
+- Rejected non-finite polygon point coordinates in both polygon compilation and direct polygon band helper calls
+- Guarded repeated-text line layout against non-advancing empty-word tokens
+- Rejected `shapeStyle.shadow.blur` values above 500 to prevent oversized SVG shadow expansion
+- Extracted shared `intersectIntervalSets(...)` interval logic for polygon and text-mask band generation
+- Declared the higher Node engine floor for `examples/react-published-package-consumer/` while keeping the root library floor at Node 18+
