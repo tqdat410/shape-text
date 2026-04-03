@@ -1,6 +1,6 @@
 {
   "name": "shape-text",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Browser-first TypeScript library for shape-paragraph layout inside geometry and value-derived shapes, rendered to SVG.",
   "type": "module",
   "main": "./dist/index.js",
